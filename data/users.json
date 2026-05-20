@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "name": "张IT管理员",
+    "email": "it@company.com",
+    "role": "it_admin",
+    "department": "IT部"
+  },
+  {
+    "id": "2",
+    "name": "李流程Owner",
+    "email": "owner@company.com",
+    "role": "process_owner",
+    "department": "生产部"
+  },
+  {
+    "id": "3",
+    "name": "王业务人员",
+    "email": "business@company.com",
+    "role": "business_user",
+    "department": "生产部"
+  }
+]
