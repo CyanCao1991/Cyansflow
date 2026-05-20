@@ -343,7 +343,6 @@ export const AssetMapEditor: React.FC<AssetMapEditorProps> = ({ map, onUpdate, o
                 transformOrigin: '0 0',
               }}
               onMouseMove={handleNodeMouseMove}
-              onMouseUp={handleNodeMouseUp}
               className="absolute inset-0"
             >
               {/* 绘制边 */}
