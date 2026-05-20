@@ -42,9 +42,8 @@ export const ProjectDetail: React.FC = () => {
     
     const stage = stages.find(s => s.projectId === currentProject.id && s.type === stageType);
     if (stage && stage.status !== 'locked') {
-      await loadDialogues(stage.id);
-      setSelectedStageId(stage.id);
-      setAiPanelOpen(true);
+      // 导航到阶段详情页面
+      navigate(`/project/${currentProject.id}/stage/${stageType}`);
     }
   };
   

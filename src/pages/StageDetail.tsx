@@ -8,13 +8,13 @@ import { AIChatPanel } from '../components/ai/AIChatPanel';
 import { useProjectStore } from '../stores/projectStore';
 import { useStageStore } from '../stores/stageStore';
 import { useAIStore } from '../stores/aiStore';
-import { getStageConfig, STAGES } from '../constants/stages';
+import { getStageConfig, STAGES, STAGE_ORDER, getStageIndex } from '../constants/stages';
 import { StageType } from '../types';
 
 export const StageDetail: React.FC = () => {
   const { id, stageType } = useParams<{ id: string; stageType: string }>();
   const navigate = useNavigate();
-  const { currentProject } = useProjectStore();
+  const { currentProject, updateProject } = useProjectStore();
   const { stages, loadStages, updateStage, completeStage } = useStageStore();
   const { loadDialogues, createDialogue, currentMode } = useAIStore();
   
@@ -46,6 +46,19 @@ export const StageDetail: React.FC = () => {
     if (!currentProject || !stageType) return;
     await completeStage(currentProject.id, stageType as StageType);
     await updateStage(currentStage!.id, { status: 'completed' });
+    
+    // 更新项目的 currentStage 为下一个阶段
+    const currentIndex = getStageIndex(stageType as StageType);
+    if (currentIndex < STAGE_ORDER.length - 1) {
+      const nextStageType = STAGE_ORDER[currentIndex + 1];
+      await updateProject(currentProject.id, { currentStage: nextStageType });
+    } else {
+      // 如果是最后一个阶段，标记项目为完成
+      await updateProject(currentProject.id, { status: 'completed' });
+    }
+    
+    // 导航回项目详情页面
+    navigate(`/project/${id}`);
   };
   
   if (!config || !currentProject) {
