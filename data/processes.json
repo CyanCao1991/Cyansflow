@@ -1,1 +1,95 @@
-[]
+[
+  {
+    "id": "mpdl8mvwbvng0ciej3n",
+    "code": "PROC-903644",
+    "name": "生产流程模板 - 张IT管理员",
+    "version": "V1.0",
+    "status": "draft",
+    "owner": "张IT管理员",
+    "department": "IT部",
+    "createdAt": "2026-05-20T04:55:03.644Z",
+    "updatedAt": "2026-05-20T04:56:01.085Z",
+    "isTemplate": false,
+    "trunkNodes": [
+      {
+        "id": "mpdl8mvw9ajeiyy483a",
+        "name": "销售订单",
+        "type": "trunk",
+        "department": "销售部",
+        "owner": "销售经理",
+        "description": "接收客户订单",
+        "input": "客户需求",
+        "output": "确认订单",
+        "children": [
+          {
+            "name": "",
+            "department": "",
+            "owner": "",
+            "description": "",
+            "input": "",
+            "output": "",
+            "id": "mpdl9lc0lt8cjb6hqbc",
+            "type": "sub",
+            "parentId": "mpdl8mvw9ajeiyy483a",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "mpdl8mvwbmguc8qcakw",
+        "name": "生产计划",
+        "type": "trunk",
+        "department": "计划部",
+        "owner": "计划员",
+        "description": "制定生产计划",
+        "input": "订单信息",
+        "output": "生产计划",
+        "children": []
+      },
+      {
+        "id": "mpdl8mvwcszjap129pm",
+        "name": "物料齐套",
+        "type": "trunk",
+        "department": "采购部",
+        "owner": "采购员",
+        "description": "确认物料到位",
+        "input": "生产计划",
+        "output": "齐套确认",
+        "children": []
+      },
+      {
+        "id": "mpdl8mvwwmrkrjn5n8g",
+        "name": "生产执行",
+        "type": "trunk",
+        "department": "生产部",
+        "owner": "生产主管",
+        "description": "执行生产任务",
+        "input": "齐套物料",
+        "output": "半成品/成品",
+        "children": []
+      },
+      {
+        "id": "mpdl8mvw51zlbxb6heg",
+        "name": "质量检验",
+        "type": "trunk",
+        "department": "质量部",
+        "owner": "质检员",
+        "description": "产品检验",
+        "input": "成品",
+        "output": "检验报告",
+        "children": []
+      },
+      {
+        "id": "mpdl8mvw1tgp1nblv6u",
+        "name": "成品入库",
+        "type": "trunk",
+        "department": "仓储部",
+        "owner": "仓管员",
+        "description": "成品入库",
+        "input": "合格成品",
+        "output": "入库单",
+        "children": []
+      }
+    ]
+  }
+]
