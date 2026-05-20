@@ -129,6 +129,85 @@ export const StageDetail: React.FC = () => {
                 </div>
               </Card>
               
+              {config.activities && config.activities.length > 0 && (
+                <Card>
+                  <div className="p-6 border-b border-gray-700/50">
+                    <h2 className="text-lg font-semibold text-gray-100">关键活动</h2>
+                    <p className="text-sm text-gray-400 mt-1">此阶段的详细活动指引</p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-6">
+                      {config.activities.map((activity, index) => (
+                        <div key={index} className="border border-gray-700/50 rounded-lg overflow-hidden">
+                          <div 
+                            className="px-4 py-3 font-medium"
+                            style={{ background: config.color + '10', color: config.color }}
+                          >
+                            {index + 1}. {activity.name}
+                          </div>
+                          <div className="p-4 space-y-4">
+                            <p className="text-sm text-gray-400">{activity.description}</p>
+                            
+                            {activity.inputs && activity.inputs.length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-300 mb-2">📥 输入</h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {activity.inputs.map((input, i) => (
+                                    <span key={i} className="px-2 py-1 text-xs bg-gray-800 text-gray-300 rounded">
+                                      {input}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {activity.outputs && activity.outputs.length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-300 mb-2">📤 输出</h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {activity.outputs.map((output, i) => (
+                                    <span key={i} className="px-2 py-1 text-xs bg-gray-800 text-gray-300 rounded">
+                                      {output}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {activity.checklist && activity.checklist.length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-300 mb-2">✅ Checklist</h4>
+                                <ul className="space-y-1">
+                                  {activity.checklist.map((item, i) => (
+                                    <li key={i} className="text-sm text-gray-400 flex items-start space-x-2">
+                                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0"></span>
+                                      <span>{item}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            
+                            {activity.promptTemplates && activity.promptTemplates.length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-300 mb-2">💡 参考提示词</h4>
+                                <div className="space-y-2">
+                                  {activity.promptTemplates.map((prompt, i) => (
+                                    <div key={i} className="p-3 bg-gray-800/50 rounded border border-gray-700/50">
+                                      <p className="text-sm text-gray-300">{prompt}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+              )}
+              
               <Card>
                 <div className="p-6 border-b border-gray-700/50">
                   <h2 className="text-lg font-semibold text-gray-100">内容编辑</h2>

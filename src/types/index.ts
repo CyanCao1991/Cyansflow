@@ -86,6 +86,15 @@ export interface Task {
   createdAt: number;
 }
 
+export interface StageActivity {
+  name: string;
+  description: string;
+  inputs: string[];
+  outputs: string[];
+  checklist: string[];
+  promptTemplates: string[];
+}
+
 export interface StageConfig {
   type: StageType;
   name: string;
@@ -94,6 +103,7 @@ export interface StageConfig {
   description: string;
   mode: AIMode;
   steps: string[];
+  activities: StageActivity[];
 }
 
 export interface StageProgress {
