@@ -116,3 +116,69 @@ export interface StageProgress {
   status: StageStatus;
   progress: number;
 }
+
+// ============================================
+// 流程资产地图类型定义
+// ============================================
+
+export type AssetNodeType = 
+  | 'process'      // 流程节点
+  | 'system'       // 系统节点
+  | 'data'         // 数据节点
+  | 'role'         // 角色节点
+  | 'milestone'    // 里程碑节点
+  | 'decision'     // 决策节点
+  | 'note';        // 备注节点
+
+export interface AssetNode {
+  id: string;
+  type: AssetNodeType;
+  label: string;
+  description?: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  color?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AssetEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  type?: 'solid' | 'dashed' | 'dotted';
+  color?: string;
+}
+
+export interface AssetMap {
+  id: string;
+  projectId: string;
+  name: string;
+  description?: string;
+  nodes: AssetNode[];
+  edges: AssetEdge[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const NODE_TYPE_COLORS: Record<AssetNodeType, string> = {
+  process: '#8b5cf6',      // 紫色
+  system: '#3b82f6',       // 蓝色
+  data: '#10b981',         // 绿色
+  role: '#f59e0b',         // 橙色
+  milestone: '#ef4444',    // 红色
+  decision: '#ec4899',     // 粉色
+  note: '#6b7280',         // 灰色
+};
+
+export const NODE_TYPE_ICONS: Record<AssetNodeType, string> = {
+  process: '🔄',
+  system: '💻',
+  data: '📊',
+  role: '👤',
+  milestone: '🎯',
+  decision: '⚡',
+  note: '📝',
+};
