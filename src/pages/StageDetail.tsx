@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, CheckCircle2, Lock } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Lock } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
-import { AIChatPanel } from '../components/ai/AIChatPanel';
 import { useProjectStore } from '../stores/projectStore';
 import { useStageStore } from '../stores/stageStore';
-import { useAIStore } from '../stores/aiStore';
-import { getStageConfig, STAGES, STAGE_ORDER, getStageIndex } from '../constants/stages';
+import { getStageConfig, STAGE_ORDER, getStageIndex } from '../constants/stages';
 import { StageType } from '../types';
 
 export const StageDetail: React.FC = () => {
@@ -16,9 +14,7 @@ export const StageDetail: React.FC = () => {
   const navigate = useNavigate();
   const { currentProject, updateProject } = useProjectStore();
   const { stages, loadStages, updateStage, completeStage } = useStageStore();
-  const { loadDialogues, createDialogue, currentMode } = useAIStore();
   
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [content, setContent] = useState('');
   
   const config = getStageConfig(stageType as StageType);
@@ -33,9 +29,8 @@ export const StageDetail: React.FC = () => {
   useEffect(() => {
     if (currentStage) {
       setContent(currentStage.content);
-      loadDialogues(currentStage.id);
     }
-  }, [currentStage, loadDialogues]);
+  }, [currentStage]);
   
   const handleSave = async () => {
     if (!currentStage) return;
@@ -89,10 +84,6 @@ export const StageDetail: React.FC = () => {
           </div>
           <p className="text-sm text-gray-400 mt-1">{config.description}</p>
         </div>
-        <Button variant="secondary" onClick={() => setAiPanelOpen(true)}>
-          <Sparkles className="w-4 h-4 mr-2" />
-          AI协作
-        </Button>
       </div>
       
       {isLocked ? (
@@ -188,16 +179,49 @@ export const StageDetail: React.FC = () => {
                               </div>
                             )}
                             
-                            {activity.promptTemplates && activity.promptTemplates.length > 0 && (
-                              <div>
-                                <h4 className="text-sm font-medium text-gray-300 mb-2">💡 参考提示词</h4>
-                                <div className="space-y-2">
-                                  {activity.promptTemplates.map((prompt, i) => (
-                                    <div key={i} className="p-3 bg-gray-800/50 rounded border border-gray-700/50">
-                                      <p className="text-sm text-gray-300">{prompt}</p>
+                            {activity.promptTemplates && (
+                              <div className="space-y-4">
+                                {activity.promptTemplates.qa && activity.promptTemplates.qa.length > 0 && (
+                                  <div>
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">💬 问答提示词</h4>
+                                    <p className="text-xs text-gray-500 mb-2">用于与AI进行问答交流，深入探讨此活动</p>
+                                    <div className="space-y-2">
+                                      {activity.promptTemplates.qa.map((prompt, i) => (
+                                        <div key={`qa-${i}`} className="p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg">
+                                          <p className="text-sm text-blue-300">{prompt}</p>
+                                        </div>
+                                      ))}
                                     </div>
-                                  ))}
-                                </div>
+                                  </div>
+                                )}
+                                
+                                {activity.promptTemplates.summary && activity.promptTemplates.summary.length > 0 && (
+                                  <div>
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">📝 总结提示词</h4>
+                                    <p className="text-xs text-gray-500 mb-2">用于总结问答记录，形成清晰认知</p>
+                                    <div className="space-y-2">
+                                      {activity.promptTemplates.summary.map((prompt, i) => (
+                                        <div key={`summary-${i}`} className="p-3 bg-green-900/20 border border-green-800/30 rounded-lg">
+                                          <p className="text-sm text-green-300">{prompt}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {activity.promptTemplates.output && activity.promptTemplates.output.length > 0 && (
+                                  <div>
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">📄 输出物提示词</h4>
+                                    <p className="text-xs text-gray-500 mb-2">用于基于总结结果，产出正式文档</p>
+                                    <div className="space-y-2">
+                                      {activity.promptTemplates.output.map((prompt, i) => (
+                                        <div key={`output-${i}`} className="p-3 bg-purple-900/20 border border-purple-800/30 rounded-lg">
+                                          <p className="text-sm text-purple-300">{prompt}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
@@ -230,55 +254,8 @@ export const StageDetail: React.FC = () => {
             
             <div className="space-y-6">
               <Card className="p-4">
-                <h3 className="font-medium text-gray-100 mb-4">AI协作模式</h3>
-                <div className="space-y-2">
-                  <div 
-                    className="p-3 rounded-lg"
-                    style={{ background: currentMode === 'questioning' ? '#8b5cf620' : '#1f2937' }}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-purple-400">💭</span>
-                      <span className={`text-sm ${currentMode === 'questioning' ? 'text-purple-400' : 'text-gray-400'}`}>
-                        追问式 - 深挖背景
-                      </span>
-                    </div>
-                  </div>
-                  <div 
-                    className="p-3 rounded-lg"
-                    style={{ background: currentMode === 'comparing' ? '#3b82f620' : '#1f2937' }}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-blue-400">⚖️</span>
-                      <span className={`text-sm ${currentMode === 'comparing' ? 'text-blue-400' : 'text-gray-400'}`}>
-                        对比式 - 方案选择
-                      </span>
-                    </div>
-                  </div>
-                  <div 
-                    className="p-3 rounded-lg"
-                    style={{ background: currentMode === 'validating' ? '#10b98120' : '#1f2937' }}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-green-400">✓</span>
-                      <span className={`text-sm ${currentMode === 'validating' ? 'text-green-400' : 'text-gray-400'}`}>
-                        验证式 - 检查完整性
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-4">
                 <h3 className="font-medium text-gray-100 mb-4">阶段操作</h3>
                 <div className="space-y-2">
-                  <Button 
-                    variant="secondary" 
-                    className="w-full"
-                    onClick={() => setAiPanelOpen(true)}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    开始AI协作
-                  </Button>
                   <Button 
                     className="w-full"
                     onClick={handleComplete}
@@ -291,13 +268,6 @@ export const StageDetail: React.FC = () => {
               </Card>
             </div>
           </div>
-          
-          <AIChatPanel
-            stageId={currentStage?.id || ''}
-            stageType={stageType as StageType}
-            isOpen={aiPanelOpen}
-            onClose={() => setAiPanelOpen(false)}
-          />
         </>
       )}
     </div>

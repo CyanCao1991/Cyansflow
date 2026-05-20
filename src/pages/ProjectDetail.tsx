@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, FileText, Users } from 'lucide-react';
+import { ArrowLeft, FileText, Users } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { StageCard } from '../components/workflow/StageCard';
 import { StageProgress } from '../components/workflow/StageProgress';
-import { AIChatPanel } from '../components/ai/AIChatPanel';
 import { useProjectStore } from '../stores/projectStore';
 import { useStageStore } from '../stores/stageStore';
-import { useAIStore } from '../stores/aiStore';
 import { STAGES, getStageConfig, getStageIndex, canAccessStage } from '../constants/stages';
 import { formatDate } from '../utils/formatDate';
 
@@ -18,9 +16,6 @@ export const ProjectDetail: React.FC = () => {
   const navigate = useNavigate();
   const { getProjectById, setCurrentProject, currentProject } = useProjectStore();
   const { stages, loadStages, getStageProgress } = useStageStore();
-  const { loadDialogues } = useAIStore();
-  
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
   
   useEffect(() => {
@@ -86,10 +81,6 @@ export const ProjectDetail: React.FC = () => {
             <p className="text-sm text-gray-400 mt-1">{currentProject.description}</p>
           )}
         </div>
-        <Button variant="secondary" onClick={() => setAiPanelOpen(true)}>
-          <Sparkles className="w-4 h-4 mr-2" />
-          AI助手
-        </Button>
       </div>
       
       <Card className="p-6">
@@ -184,13 +175,6 @@ export const ProjectDetail: React.FC = () => {
           </Card>
         </div>
       </div>
-      
-      <AIChatPanel
-        stageId={selectedStageId || ''}
-        stageType={currentProject.currentStage}
-        isOpen={aiPanelOpen}
-        onClose={() => setAiPanelOpen(false)}
-      />
     </div>
   );
 };
