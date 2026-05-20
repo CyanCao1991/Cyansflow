@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Lock } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Lock, Edit2 } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
+import { TemplateEditor } from '../components/common/TemplateEditor';
 import { useProjectStore } from '../stores/projectStore';
 import { useStageStore } from '../stores/stageStore';
 import { getStageConfig, STAGE_ORDER, getStageIndex } from '../constants/stages';
@@ -16,6 +17,11 @@ export const StageDetail: React.FC = () => {
   const { stages, loadStages, updateStage, completeStage } = useStageStore();
   
   const [content, setContent] = useState('');
+  const [editingTemplate, setEditingTemplate] = useState<{
+    stageType: string;
+    activityIndex: number;
+    activityName: string;
+  } | null>(null);
   
   const config = getStageConfig(stageType as StageType);
   const currentStage = stages.find(s => s.projectId === id && s.type === stageType);
@@ -131,10 +137,24 @@ export const StageDetail: React.FC = () => {
                       {config.activities.map((activity, index) => (
                         <div key={index} className="border border-gray-700/50 rounded-lg overflow-hidden">
                           <div 
-                            className="px-4 py-3 font-medium"
+                            className="px-4 py-3 font-medium flex items-center justify-between"
                             style={{ background: config.color + '10', color: config.color }}
                           >
-                            {index + 1}. {activity.name}
+                            <div className="flex items-center space-x-2">
+                              <span>{index + 1}.</span>
+                              <span>{activity.name}</span>
+                            </div>
+                            <button
+                              onClick={() => setEditingTemplate({
+                                stageType: stageType as string,
+                                activityIndex: index,
+                                activityName: activity.name,
+                              })}
+                              className="p-1 hover:bg-white/10 rounded transition-colors"
+                              title="编辑提示词模板"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
                           </div>
                           <div className="p-4 space-y-4">
                             <p className="text-sm text-gray-400">{activity.description}</p>
@@ -269,6 +289,16 @@ export const StageDetail: React.FC = () => {
             </div>
           </div>
         </>
+      )}
+      
+      {editingTemplate && (
+        <TemplateEditor
+          stageType={editingTemplate.stageType}
+          activityIndex={editingTemplate.activityIndex}
+          activityName={editingTemplate.activityName}
+          isOpen={true}
+          onClose={() => setEditingTemplate(null)}
+        />
       )}
     </div>
   );

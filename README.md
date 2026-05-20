@@ -1,57 +1,73 @@
-# React + TypeScript + Vite
+# 甲方PM工作流智能协作平台
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+帮助甲方PM从模糊业务诉求到可交付系统的完整生命周期管理，每个阶段提供结构化的思考框架和产出指引。
 
-Currently, two official plugins are available:
+## 核心功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 11个阶段工作流
+- 业务规划 → 流程梳理 → 方案设计 → 概要设计 → 原型设计 → 详细设计 → 用例编写 → BP测试 → 验收 → 配置 → 运维
 
-## Expanding the ESLint configuration
+### 每个阶段的结构化内容
+- **关键活动**: 每个阶段包含3-4个关键活动
+- **输入输出**: 明确每个活动需要的输入和产出
+- **Checklist**: 验证活动完成情况
+- **提示词模板**: 
+  - 💬 问答提示词 - 用于深入探讨
+  - 📝 总结提示词 - 用于归纳整理
+  - 📄 输出物提示词 - 用于产出文档
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 自定义模板
+支持用户自定义修改每个阶段的提示词模板，修改会自动应用到项目中。
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 技术栈
+
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- Zustand (状态管理)
+- Dexie.js (本地存储)
+- React Router
+
+## 快速开始
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
+
+# 类型检查
+npm run check
+
+# 代码检查
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 数据存储
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+所有数据都保存在浏览器本地存储中（IndexedDB），无需服务器即可使用。
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 使用流程
+
+1. 创建新项目
+2. 从第一个阶段开始工作
+3. 查看每个阶段的关键活动和提示词模板
+4. 根据提示词模板与AI工具协作
+5. 完成每个活动后标记为完成
+6. 进入下一个阶段
+
+## 提示词使用
+
+每个阶段的提示词模板可以复制到任何AI工具（如ChatGPT、Claude等）中使用：
+
+1. **问答提示词**: 帮助您深入思考和探讨
+2. **总结提示词**: 在讨论后整理归纳
+3. **输出物提示词**: 基于总结产出正式文档
+
+## License
+
+MIT

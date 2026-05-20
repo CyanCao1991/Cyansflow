@@ -105,12 +105,12 @@ export const Settings: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Info className="w-5 h-5 text-gray-400" />
             <div>
-              <p className="text-sm font-medium text-gray-100">甲方PM工作流操作台</p>
+              <p className="text-sm font-medium text-gray-100">甲方PM工作流智能协作平台</p>
               <p className="text-xs text-gray-500">版本 1.0.0</p>
             </div>
           </div>
           <p className="text-sm text-gray-400">
-            帮助甲方PM从模糊业务诉求到可交付系统的完整生命周期管理，AI在每个阶段扮演"思考加速器+验证器"角色。
+            帮助甲方PM从模糊业务诉求到可交付系统的完整生命周期管理，每个阶段提供结构化的思考框架和产出指引。
           </p>
         </div>
       </Card>
