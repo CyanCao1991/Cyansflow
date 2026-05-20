@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import OpenAI from 'openai';
 import { AIMessage, AIMode, StageType } from '../types';
-import { callAI, getAIConfig } from './aiProvider';
+
+export type AIProvider = 'openai' | 'anthropic' | 'template';
 
 interface ComparisonOption {
   title: string;
@@ -9,21 +11,70 @@ interface ComparisonOption {
   cons: string[];
 }
 
-const INTENT_KEYWORDS = {
-  goal: ['目标', '目的', 'KPI', '指标', '达成', '提升', '增加', '减少'],
-  painPoint: ['痛点', '问题', '困难', '障碍', '卡点', '瓶颈', '效率'],
-  boundary: ['范围', '边界', '不包括', '不做', '限制', '约束'],
-  stakeholder: ['干系人', '负责人', '使用者', '相关方', '部门', '客户'],
-  exception: ['如果', '异常', '错误', '失败', '边界', '极端情况', '万一'],
+interface AIConfig {
+  provider: AIProvider;
+  apiKey?: string;
+  baseUrl?: string;
+  model?: string;
+}
+
+const defaultConfig: AIConfig = {
+  provider: 'template',
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  baseUrl: import.meta.env.VITE_OPENAI_API_BASE_URL || 'https://api.openai.com/v1',
+  model: import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o',
 };
 
-export const recognizeIntent = (text: string): string[] => {
-  return Object.entries(INTENT_KEYWORDS)
-    .filter(([, keywords]) => keywords.some(keyword => text.includes(keyword)))
-    .map(([intent]) => intent);
+let currentConfig: AIConfig = { ...defaultConfig };
+
+export const setAIConfig = (config: Partial<AIConfig>) => {
+  currentConfig = { ...currentConfig, ...config };
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('aiConfig', JSON.stringify(currentConfig));
+  }
 };
 
-export const generateAIResponse = async (
+export const getAIConfig = (): AIConfig => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('aiConfig');
+    if (saved) {
+      try {
+        currentConfig = { ...defaultConfig, ...JSON.parse(saved) };
+      } catch {
+        // 忽略无效的保存配置
+      }
+    }
+  }
+  return currentConfig;
+};
+
+const getStagePrompt = (stageType: StageType): string => {
+  const prompts: Record<StageType, string> = {
+    'business-planning': '你是一位专业的业务分析师，帮助用户进行业务规划。通过5Why方法深入挖掘用户需求，追问业务背景、痛点、目标用户和期望效果。',
+    'process-mapping': '你是一位流程优化专家，帮助用户梳理当前业务流程。询问流程环节、耗时角色、卡点和理想流程。',
+    'solution-design': '你是一位解决方案架构师，帮助用户设计业务方案。明确核心业务规则、特殊情况处理、权限划分和数据实体设计。',
+    'system-architecture': '你是一位技术架构师，帮助用户设计系统架构。询问用户量、并发、外部系统对接、安全要求和性能指标。',
+    'prototype-design': '你是一位产品设计师，帮助用户设计界面原型。关注用户、操作、信息展示、易错点和多设备适配。',
+    'detailed-design': '你是一位系统设计师，帮助用户完成详细设计。关注数据量、索引、接口频率、状态机和异常处理。',
+    'test-cases': '你是一位测试专家，帮助用户编写测试用例。关注正向流程、边界值、异常场景、并发和测试数据。',
+    'bp-testing': '你是一位QA工程师，帮助用户进行BP测试。关注测试场景优先级、数据来源、bug记录和回归测试。',
+    'acceptance': '你是一位验收专家，帮助用户制定验收标准。关注验收指标、负责人、缺陷分级和上线计划。',
+    'configuration': '你是一位配置管理专家，帮助用户进行系统配置。关注配置项频率、审批流程、验证方法和环境管理。',
+    'operations': '你是一位运维专家，帮助用户规划运维保障。关注运维负责人、响应时间、监控指标、应急预案和升级流程。',
+  };
+  return prompts[stageType] || '你是一位专业的助手，帮助用户完成当前阶段的工作。';
+};
+
+const getModePrompt = (mode: AIMode): string => {
+  const modePrompts: Record<AIMode, string> = {
+    questioning: '使用追问模式，通过连续的问题帮助用户深入思考和明确需求。每次只问一个问题，不要一次性问太多。',
+    comparing: '使用对比模式，为用户提供2-3个不同的方案，并分析每个方案的优缺点，帮助用户做出选择。',
+    validating: '使用验证模式，检查用户的方案是否完整，识别潜在风险和遗漏的场景，提供改进建议。',
+  };
+  return modePrompts[mode];
+};
+
+export const callAI = async (
   mode: AIMode,
   stageType: StageType,
   messages: AIMessage[],
@@ -31,11 +82,97 @@ export const generateAIResponse = async (
 ): Promise<AIMessage> => {
   const config = getAIConfig();
   
-  if (config.provider !== 'template' && config.apiKey) {
-    return await callAI(mode, stageType, messages, userMessage);
+  if (config.provider === 'template' || !config.apiKey) {
+    return fallbackToTemplate(mode, stageType, messages);
   }
 
+  try {
+    if (config.provider === 'openai') {
+      return await callOpenAI(config, mode, stageType, messages, userMessage);
+    }
+    return fallbackToTemplate(mode, stageType, messages, userMessage);
+  } catch (error) {
+    console.error('AI调用失败，使用模板模式:', error);
+    return fallbackToTemplate(mode, stageType, messages, userMessage);
+  }
+};
+
+const callOpenAI = async (
+  config: AIConfig,
+  mode: AIMode,
+  stageType: StageType,
+  messages: AIMessage[],
+  userMessage?: string
+): Promise<AIMessage> => {
+  const client = new OpenAI({
+    apiKey: config.apiKey,
+    baseURL: config.baseUrl,
+    dangerouslyAllowBrowser: true,
+  });
+
+  const systemPrompt = `你是甲方PM工作流智能协作平台的AI助手。${getStagePrompt(stageType)}${getModePrompt(mode)}
+
+回复要求：
+1. 使用中文回复
+2. 语言友好、专业
+3. 每次回复不要太长，保持简洁
+4. 根据当前模式给出相应的回复`;
+
+  const openaiMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: 'system', content: systemPrompt },
+    ...messages.map(msg => ({
+      role: msg.role === 'ai' ? 'assistant' as const : 'user' as const,
+      content: msg.content,
+    })),
+  ];
+
+  if (userMessage) {
+    openaiMessages.push({ role: 'user', content: userMessage });
+  }
+
+  const response = await client.chat.completions.create({
+    model: config.model || 'gpt-4o',
+    messages: openaiMessages,
+    temperature: 0.7,
+    max_tokens: 1000,
+  });
+
+  const aiContent = response.choices[0]?.message?.content || '抱歉，我暂时无法提供帮助，请稍后再试。';
+
+  return {
+    id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    role: 'ai',
+    content: aiContent,
+    type: mode === 'comparing' ? 'suggestion' : mode === 'validating' ? 'validation' : 'question',
+    intentTags: recognizeIntent(aiContent),
+    timestamp: Date.now(),
+  };
+};
+
+const recognizeIntent = (text: string): string[] => {
+  const INTENT_KEYWORDS = {
+    goal: ['目标', '目的', 'KPI', '指标', '达成', '提升', '增加', '减少'],
+    painPoint: ['痛点', '问题', '困难', '障碍', '卡点', '瓶颈', '效率'],
+    boundary: ['范围', '边界', '不包括', '不做', '限制', '约束'],
+    stakeholder: ['干系人', '负责人', '使用者', '相关方', '部门', '客户'],
+    exception: ['如果', '异常', '错误', '失败', '边界', '极端情况', '万一'],
+  };
+
+  return Object.entries(INTENT_KEYWORDS)
+    .filter(([, keywords]) =>
+      keywords.some(keyword => text.includes(keyword))
+    )
+    .map(([intent]) => intent);
+};
+
+const fallbackToTemplate = async (
+  mode: AIMode,
+  stageType: StageType,
+  messages: AIMessage[],
+  userMessage?: string
+): Promise<AIMessage> => {
   await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1200));
+
   const id = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   const timestamp = Date.now();
 
@@ -235,13 +372,11 @@ export const generateAIResponse = async (
 
   if (mode === 'questioning') {
     const templates = AI_QUESTION_TEMPLATES[stageType] || [];
-    const usedIndices = messages.filter(m => m.role === 'ai').map(() => 0);
-    let nextIndex = 0;
-    for (let i = 0; i < Math.min(usedIndices.length, templates.length); i++) {
-      nextIndex = (nextIndex + 1) % templates.length;
-    }
+    const aiMessages = messages.filter(m => m.role === 'ai');
+    const nextIndex = aiMessages.length % templates.length;
     const question = templates[nextIndex] || '请问您对这个阶段还有什么需要补充的吗？';
     const intentTags = recognizeIntent(question);
+
     return {
       id,
       role: 'ai',
@@ -255,12 +390,10 @@ export const generateAIResponse = async (
   if (mode === 'comparing') {
     const templates = AI_COMPARISON_TEMPLATES[stageType];
     if (templates && messages.length === 1) {
-      const comparisonText = templates
-        .map(
-          (t) =>
-            `### ${t.title}\n**${t.description}**\n\n**优点：**\n${t.pros.map((p) => `- ${p}`).join('\n')}\n\n**缺点：**\n${t.cons.map((c) => `- ${c}`).join('\n')}`
-        )
-        .join('\n\n---\n\n');
+      const comparisonText = templates.map((t) =>
+        `### ${t.title}\n**${t.description}**\n\n**优点：**\n${t.pros.map(p => `- ${p}`).join('\n')}\n\n**缺点：**\n${t.cons.map(c => `- ${c}`).join('\n')}`
+      ).join('\n\n---\n\n');
+
       return {
         id,
         role: 'ai',
@@ -269,6 +402,7 @@ export const generateAIResponse = async (
         timestamp,
       };
     }
+
     return {
       id,
       role: 'ai',
@@ -284,7 +418,9 @@ export const generateAIResponse = async (
       '有没有遗漏的场景需要考虑？',
       '这个方案实施过程中可能遇到什么风险？',
     ];
+
     const question = templates[Math.floor(Math.random() * templates.length)];
+
     return {
       id,
       role: 'ai',
@@ -300,30 +436,5 @@ export const generateAIResponse = async (
     content: '收到您的输入，请问还有其他的想法吗？',
     type: 'answer',
     timestamp,
-  };
-};
-
-export const generateInitialMessage = (stageType: StageType, _mode: AIMode): AIMessage => {
-  const id = `ai-init-${Date.now()}`;
-  const stageIntros: Record<StageType, string> = {
-    'business-planning': '您好！我是您的AI协作助手。在开始业务规划之前，让我先了解一下您的需求背景。请告诉我您想做什么样的系统？',
-    'process-mapping': '现在让我们来梳理业务流程。请先描述一下当前的运作方式是怎样的？',
-    'solution-design': '基于前面的梳理，我来帮您设计具体的业务方案。首先，我们来明确一下核心的业务规则。',
-    'system-architecture': '现在进入技术架构设计阶段。我会根据业务需求，为您推荐合适的技术方案。',
-    'prototype-design': '让我们开始设计界面原型。您希望用户在这个系统中完成哪些核心操作？',
-    'detailed-design': '现在进行详细设计。我会帮您把概要设计细化为可开发的交付物。',
-    'test-cases': '我来帮您编写测试用例。首先确认一下核心的业务流程有哪些？',
-    'bp-testing': '现在开始BP测试。请告诉我需要验证的关键业务场景有哪些？',
-    'acceptance': '进入验收阶段。我会帮您制定验收标准，确保系统满足业务需求。',
-    'configuration': '现在进行系统配置。请告诉我有哪些业务参数需要灵活调整？',
-    'operations': '最后是运维保障阶段。我来帮您梳理运维场景和应急预案。',
-  };
-
-  return {
-    id,
-    role: 'ai',
-    content: stageIntros[stageType] || '让我们开始这个阶段的工作吧。',
-    type: 'answer',
-    timestamp: Date.now(),
   };
 };
