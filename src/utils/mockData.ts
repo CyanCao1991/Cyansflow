@@ -1,0 +1,135 @@
+import { Device, InspectionStandard, InspectionPlan, InspectionTask } from '@/types';
+import dayjs from 'dayjs';
+
+export const mockDevices: Device[] = [
+  {
+    id: '1',
+    name: '数控车床 A-01',
+    code: 'CNC-001',
+    type: '数控车床',
+    location: '生产车间 A',
+    production_schedule: { shift: 'day', status: 'running' },
+    status: 'active',
+    created_at: dayjs().subtract(30, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+  {
+    id: '2',
+    name: '加工中心 B-02',
+    code: 'MC-002',
+    type: '加工中心',
+    location: '生产车间 B',
+    production_schedule: { shift: 'night', status: 'standby' },
+    status: 'active',
+    created_at: dayjs().subtract(45, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+  {
+    id: '3',
+    name: '冲压机 C-03',
+    code: 'PM-003',
+    type: '冲压机',
+    location: '生产车间 C',
+    production_schedule: { shift: 'both', status: 'maintenance' },
+    status: 'maintenance',
+    created_at: dayjs().subtract(60, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+];
+
+export const mockStandards: InspectionStandard[] = [
+  {
+    id: '1',
+    name: '数控车床日常点检标准',
+    description: '数控车床每日开工前的点检标准',
+    device_types: ['数控车床'],
+    items: [
+      { id: 'i1', name: '检查润滑油位', standard: '油位在刻度线之间', method: '目视检查', tool: '', is_critical: true },
+      { id: 'i2', name: '检查液压系统', standard: '压力正常(0.5-0.8MPa)', method: '压力表检查', tool: '压力表', is_critical: true },
+      { id: 'i3', name: '检查导轨润滑', standard: '导轨有油膜覆盖', method: '目视检查', tool: '', is_critical: false },
+      { id: 'i4', name: '检查安全门开关', standard: '安全门闭合时设备可运行', method: '功能测试', tool: '', is_critical: true },
+    ],
+    frequency: 'daily',
+    role: 'maintenance_tech',
+    fmea_data: { risk_level: 'high' },
+    created_at: dayjs().subtract(60, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+  {
+    id: '2',
+    name: '加工中心周检标准',
+    description: '加工中心每周例行检查标准',
+    device_types: ['加工中心'],
+    items: [
+      { id: 'i5', name: '检查刀具磨损', standard: '刀具完好无崩刃', method: '目视检查', tool: '', is_critical: true },
+      { id: 'i6', name: '检查主轴精度', standard: '径向跳动≤0.01mm', method: '百分表测量', tool: '百分表', is_critical: true },
+      { id: 'i7', name: '检查冷却系统', standard: '冷却液充足且清洁', method: '目视检查', tool: '', is_critical: false },
+    ],
+    frequency: 'weekly',
+    role: 'maintenance_supervisor',
+    fmea_data: { risk_level: 'medium' },
+    created_at: dayjs().subtract(75, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+];
+
+export const mockPlans: InspectionPlan[] = [
+  {
+    id: '1',
+    device_id: '1',
+    standard_id: '1',
+    planned_date: dayjs().add(1, 'day').toISOString(),
+    status: 'confirmed',
+    conditions_check_result: { has_production: false, window_available: true },
+    skip_reason: '',
+    created_at: dayjs().subtract(2, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+  {
+    id: '2',
+    device_id: '2',
+    standard_id: '2',
+    planned_date: dayjs().add(3, 'day').toISOString(),
+    status: 'draft',
+    conditions_check_result: null,
+    skip_reason: '',
+    created_at: dayjs().subtract(1, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+];
+
+export const mockTasks: InspectionTask[] = [
+  {
+    id: '1',
+    plan_id: '1',
+    device_id: '1',
+    executor_id: '1',
+    status: 'completed',
+    results: [
+      { item_id: 'i1', result: 'pass', value: '正常', notes: '' },
+      { item_id: 'i2', result: 'pass', value: '0.6MPa', notes: '' },
+      { item_id: 'i3', result: 'pass', value: '正常', notes: '' },
+      { item_id: 'i4', result: 'pass', value: '正常', notes: '' },
+    ],
+    photos: [],
+    notes: '点检完成，一切正常',
+    skip_reason: '',
+    executed_at: dayjs().subtract(1, 'day').toISOString(),
+    created_at: dayjs().subtract(2, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+  {
+    id: '2',
+    plan_id: '2',
+    device_id: '3',
+    executor_id: '1',
+    status: 'skipped',
+    results: [],
+    photos: [],
+    notes: '',
+    skip_reason: '设备正在生产中，无法点检',
+    executed_at: '',
+    created_at: dayjs().subtract(5, 'day').toISOString(),
+    updated_at: dayjs().toISOString(),
+  },
+];
