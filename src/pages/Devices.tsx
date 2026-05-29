@@ -140,7 +140,7 @@ const Devices: React.FC = () => {
         </Button>
       </div>
 
-      <Card className="shadow-sm" bordered={false}>
+      <Card className="shadow-sm" variant="borderless">
         <Table
           columns={columns}
           dataSource={devices}

@@ -9,7 +9,6 @@ import {
   Badge,
   Button,
   Drawer,
-  List,
 } from 'antd';
 import {
   DashboardOutlined,
@@ -103,12 +102,12 @@ const AppLayout: React.FC = () => {
           </div>
         </div>
       </div>
-      <List
-        dataSource={menuItems}
-        renderItem={(item) => {
+      <div className="space-y-2">
+        {menuItems.map((item) => {
           const isActive = location.pathname === item.key;
           return (
-            <List.Item
+            <div
+              key={item.key}
               className={`cursor-pointer transition-all px-4 py-3 rounded-lg mb-2 ${
                 isActive 
                   ? 'bg-blue-50 text-blue-600 font-medium' 
@@ -120,10 +119,10 @@ const AppLayout: React.FC = () => {
                 <span className="text-xl">{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
-            </List.Item>
+            </div>
           );
-        }}
-      />
+        })}
+      </div>
     </div>
   );
 
@@ -175,7 +174,7 @@ const AppLayout: React.FC = () => {
           placement="left"
           onClose={() => setMobileMenuVisible(false)}
           open={mobileMenuVisible}
-          width={280}
+          size={280}
           styles={{ body: { padding: 0 } }}
         >
           <MobileMenu />

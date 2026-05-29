@@ -101,12 +101,12 @@ const Dashboard: React.FC = () => {
       
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="设备总数"
               value={devices.length}
               prefix={<ToolOutlined className="text-blue-600" />}
-              valueStyle={{ color: '#165DFF' }}
+              styles={{ content: { color: '#165DFF' } }}
             />
             <div className="mt-4">
               <Progress percent={(activeDevices / devices.length) * 100} status="active" strokeColor="#52C41A" />
@@ -115,12 +115,12 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="已完成点检"
               value={completedTasks}
               prefix={<CheckCircleOutlined className="text-green-600" />}
-              valueStyle={{ color: '#52C41A' }}
+              styles={{ content: { color: '#52C41A' } }}
             />
             <div className="mt-4">
               <Progress percent={tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0} strokeColor="#52C41A" />
@@ -129,12 +129,12 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="待处理任务"
               value={pendingTasks}
               prefix={<ClockCircleOutlined className="text-orange-600" />}
-              valueStyle={{ color: '#FA8C16' }}
+              styles={{ content: { color: '#FA8C16' } }}
             />
             <div className="mt-4">
               <Space size="small">
@@ -145,12 +145,12 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="已跳过任务"
               value={skippedTasks}
               prefix={<WarningOutlined className="text-gray-500" />}
-              valueStyle={{ color: '#8C8C8C' }}
+              styles={{ content: { color: '#8C8C8C' } }}
             />
             <div className="mt-4">
               <Text type="secondary" className="text-sm">
@@ -164,19 +164,19 @@ const Dashboard: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={14}>
           <Card
-            title="本周点检执行情况"
-            className="shadow-sm"
-            bordered={false}
-          >
+          title="本周点检执行情况"
+          className="shadow-sm"
+          variant="borderless"
+        >
             <ReactECharts option={chartOption} style={{ height: 350 }} />
           </Card>
         </Col>
         <Col xs={24} lg={10}>
           <Card
-            title="设备状态分布"
-            className="shadow-sm"
-            bordered={false}
-          >
+          title="设备状态分布"
+          className="shadow-sm"
+          variant="borderless"
+        >
             <ReactECharts option={pieOption} style={{ height: 350 }} />
           </Card>
         </Col>
@@ -185,11 +185,11 @@ const Dashboard: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card
-            title="点检标准概览"
-            className="shadow-sm"
-            bordered={false}
-          >
-            <Space direction="vertical" className="w-full" size="middle">
+          title="点检标准概览"
+          className="shadow-sm"
+          variant="borderless"
+        >
+            <Space orientation="vertical" className="w-full" size="middle">
               {standards.map(standard => (
                 <div key={standard.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex justify-between items-start">
@@ -213,11 +213,11 @@ const Dashboard: React.FC = () => {
         </Col>
         <Col xs={24} lg={12}>
           <Card
-            title="最近执行记录"
-            className="shadow-sm"
-            bordered={false}
-          >
-            <Space direction="vertical" className="w-full" size="middle">
+          title="最近执行记录"
+          className="shadow-sm"
+          variant="borderless"
+        >
+            <Space orientation="vertical" className="w-full" size="middle">
               {tasks.slice(0, 3).map(task => {
                 const device = devices.find(d => d.id === task.device_id);
                 return (

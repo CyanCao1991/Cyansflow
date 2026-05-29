@@ -32,7 +32,7 @@ const Settings: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title="基本设置" className="shadow-sm" bordered={false}>
+          <Card title="基本设置" className="shadow-sm" variant="borderless">
             <Form form={form} layout="vertical" initialValues={{
               companyName: '',
               timezone: 'Asia/Shanghai',
@@ -73,7 +73,7 @@ const Settings: React.FC = () => {
         </Col>
 
         <Col xs={24} lg={12}>
-          <Card title="点检配置" className="shadow-sm" bordered={false}>
+          <Card title="点检配置" className="shadow-sm" variant="borderless">
             <Form form={form} layout="vertical">
               <Form.Item
                 name="autoGeneratePlans"
@@ -104,8 +104,8 @@ const Settings: React.FC = () => {
         </Col>
       </Row>
 
-      <Card title="数据管理" className="shadow-sm" bordered={false}>
-        <Space direction="vertical" size="middle" className="w-full">
+      <Card title="数据管理" className="shadow-sm" variant="borderless">
+        <Space orientation="vertical" size="middle" className="w-full">
           <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
             <div>
               <Text strong>导出数据</Text>

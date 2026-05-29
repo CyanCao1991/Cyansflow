@@ -11,7 +11,6 @@ import {
   Select,
   message,
   Typography,
-  List,
   Switch,
   InputNumber,
 } from 'antd';
@@ -168,7 +167,7 @@ const Standards: React.FC = () => {
         </Button>
       </div>
 
-      <Card className="shadow-sm" bordered={false}>
+      <Card className="shadow-sm" variant="borderless">
         <Table
           columns={columns}
           dataSource={standards}
@@ -183,10 +182,9 @@ const Standards: React.FC = () => {
             expandedRowRender: (record) => (
               <div className="p-4">
                 <Text strong className="mb-2 block">点检项目详情:</Text>
-                <List
-                  dataSource={record.items}
-                  renderItem={(item) => (
-                    <List.Item>
+                <div className="space-y-3">
+                  {record.items.map((item, index) => (
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg">
                       <div className="flex w-full justify-between items-center">
                         <div>
                           <Text strong>{item.name}</Text>
@@ -197,9 +195,9 @@ const Standards: React.FC = () => {
                         </div>
                         {item.is_critical && <Tag color="red">关键项</Tag>}
                       </div>
-                    </List.Item>
-                  )}
-                />
+                    </div>
+                  ))}
+                </div>
               </div>
             ),
           }}

@@ -170,7 +170,7 @@ const Tasks: React.FC = () => {
     <div className="space-y-6">
       <Title level={2} className="!mb-0">点检任务执行</Title>
 
-      <Card className="shadow-sm" bordered={false}>
+      <Card className="shadow-sm" variant="borderless">
         <Table
           columns={columns}
           dataSource={tasks}

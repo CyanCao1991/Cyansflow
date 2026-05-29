@@ -137,42 +137,42 @@ const Analytics: React.FC = () => {
       {/* KPI 指标卡片 */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="点检完成率"
               value={completionRate}
               suffix="%"
-              valueStyle={{ color: completionRate >= 90 ? '#52C41A' : completionRate >= 70 ? '#FA8C16' : '#FF4D4F' }}
+              styles={{ content: { color: completionRate >= 90 ? '#52C41A' : completionRate >= 70 ? '#FA8C16' : '#FF4D4F' } }}
               prefix={<CheckCircleOutlined />}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="已完成任务"
               value={completedTasks}
-              valueStyle={{ color: '#52C41A' }}
+              styles={{ content: { color: '#52C41A' } }}
               prefix={<CheckCircleOutlined />}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="已跳过任务"
               value={skippedTasks}
-              valueStyle={{ color: '#FA8C16' }}
+              styles={{ content: { color: '#FA8C16' } }}
               prefix={<WarningOutlined />}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="shadow-sm hover:shadow-md transition-shadow" bordered={false}>
+          <Card className="shadow-sm hover:shadow-md transition-shadow" variant="borderless">
             <Statistic
               title="设备总数"
               value={devices.length}
-              valueStyle={{ color: '#165DFF' }}
+              styles={{ content: { color: '#165DFF' } }}
               prefix={<ToolOutlined />}
             />
           </Card>
@@ -182,12 +182,12 @@ const Analytics: React.FC = () => {
       {/* 图表区域 */}
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title="点检执行趋势" className="shadow-sm" bordered={false}>
+          <Card title="点检执行趋势" className="shadow-sm" variant="borderless">
             <ReactECharts option={taskTrendOption} style={{ height: 300 }} />
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="设备状态分布" className="shadow-sm" bordered={false}>
+          <Card title="设备状态分布" className="shadow-sm" variant="borderless">
             <ReactECharts option={deviceStatusOption} style={{ height: 300 }} />
           </Card>
         </Col>
@@ -195,19 +195,19 @@ const Analytics: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title="点检标准使用情况" className="shadow-sm" bordered={false}>
+          <Card title="点检标准使用情况" className="shadow-sm" variant="borderless">
             <ReactECharts option={standardUsageOption} style={{ height: 300 }} />
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="任务跳过原因分布" className="shadow-sm" bordered={false}>
+          <Card title="任务跳过原因分布" className="shadow-sm" variant="borderless">
             <ReactECharts option={skipReasonsOption} style={{ height: 300 }} />
           </Card>
         </Col>
       </Row>
 
       {/* 任务详情表格 */}
-      <Card title="任务执行记录" className="shadow-sm" bordered={false}>
+      <Card title="任务执行记录" className="shadow-sm" variant="borderless">
         <Table
           columns={taskColumns}
           dataSource={tasks}

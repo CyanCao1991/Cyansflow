@@ -174,21 +174,21 @@ const Plans: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="shadow-sm" bordered={false}>
+        <Card className="shadow-sm" variant="borderless">
           <Statistic title="总计划数" value={plans.length} />
         </Card>
-        <Card className="shadow-sm" bordered={false}>
+        <Card className="shadow-sm" variant="borderless">
           <Statistic title="待确认" value={plans.filter(p => p.status === 'draft').length} />
         </Card>
-        <Card className="shadow-sm" bordered={false}>
+        <Card className="shadow-sm" variant="borderless">
           <Statistic title="执行中" value={plans.filter(p => p.status === 'executing').length} />
         </Card>
-        <Card className="shadow-sm" bordered={false}>
+        <Card className="shadow-sm" variant="borderless">
           <Statistic title="已完成" value={plans.filter(p => p.status === 'completed').length} />
         </Card>
       </div>
 
-      <Card className="shadow-sm" bordered={false}>
+      <Card className="shadow-sm" variant="borderless">
         <Table
           columns={columns}
           dataSource={plans}
