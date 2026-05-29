@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Layout,
   Menu,
@@ -66,9 +66,17 @@ const menuItems = [
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+
+  const handleMenuClick = ({ key }: { key: string }) => {
+    // 导航到对应路由
+    if (location.pathname !== key) {
+      navigate(key);
+    }
+  };
 
   useEffect(() => {
     const checkMobile = () => {
@@ -220,10 +228,17 @@ const AppLayout: React.FC = () => {
           inlineCollapsed={collapsed}
           items={menuItems.map(item => ({
             ...item,
-            label: collapsed ? '' : item.label,
+            label: collapsed ? (
+              <div className="flex items-center justify-center">
+                {item.icon}
+              </div>
+            ) : (
+              item.label
+            ),
           }))}
           className="!bg-transparent border-none mt-4"
           style={{ background: 'transparent' }}
+          onClick={handleMenuClick}
         />
       </Sider>
       <Layout className="flex flex-col bg-gray-50">
