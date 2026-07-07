@@ -1,0 +1,159 @@
+{
+  "_meta": {
+    "id": "lingxing",
+    "layer": "pattern",
+    "page_type": "create",
+    "page_type_zh": "新增页",
+    "desc": "新增（创建）类页面的布局结构、字段约定与交互模式。源自领星 ERP「创建采购单」。"
+  },
+
+  "page_structure": [
+    {
+      "block": "page_header",
+      "zh": "页面标题区",
+      "content": "页面标题文字（动词+对象，如『创建采购单』）",
+      "padding": "16px 24px",
+      "border_bottom": "1px solid #EBEEF5",
+      "actions": "无（操作按钮全部放底部固定栏）"
+    },
+    {
+      "block": "basic_info",
+      "zh": "基本信息区",
+      "container_background": "#FFFFFF",
+      "padding": "20px 24px",
+      "form": {
+        "grid_columns": 4,
+        "row_gap": "16px",
+        "column_gap": "32px",
+        "label_position": "left",
+        "label_width": "84px",
+        "label_align": "left",
+        "label_to_input_gap": "8px"
+      },
+      "collapsible": true,
+      "collapse_handle": {
+        "position": "区块底部居中",
+        "icon": "^",
+        "_desc": "整块基本信息可一键折叠/展开"
+      }
+    },
+    {
+      "block": "table_toolbar",
+      "zh": "明细表格工具栏",
+      "padding": "12px 16px",
+      "left_actions_examples": ["选择采购计划", "添加采购产品", "导入采购产品", "自动带出辅料"],
+      "right_actions_examples": ["分组筛选下拉", "🔍 搜索图标", "⚙ 列设置图标"]
+    },
+    {
+      "block": "data_table",
+      "zh": "明细表格（可行内编辑）",
+      "row_height": "48px",
+      "supports": {
+        "row_inline_edit": true,
+        "column_batch_edit": true,
+        "horizontal_scroll": true,
+        "fixed_operation_column": "right",
+        "add_row_at_end": true
+      },
+      "row_actions": ["移除", "复制"]
+    },
+    {
+      "block": "footer_actions",
+      "zh": "底部固定操作栏",
+      "position": "sticky-bottom",
+      "padding": "12px 0",
+      "background": "#FFFFFF",
+      "border_top": "1px solid #EBEEF5",
+      "alignment": "center",
+      "buttons": [
+        {"label": "取消", "type": "default"},
+        {"label": "暂存", "type": "default", "_note": "可选；非所有单据都有"},
+        {"label": "提交", "type": "primary"}
+      ]
+    }
+  ],
+
+  "field_conventions": {
+    "required_label_format": "标签 + 红色*（紧贴，无空格）",
+    "default_value_display": {
+      "rule": "有默认值的字段直接显示值，不显示 placeholder",
+      "observed_examples": {
+        "采购方": "山天电商公司（当前登录公司）",
+        "采购币种": "CNY",
+        "运费币种": "CNY",
+        "其他费用币种": "CNY",
+        "费用分配": "不分配",
+        "含税": "否",
+        "采购员": "当前登录用户（如：超级管理员）",
+        "采购类型": "普通采购",
+        "质检类型": "仓库质检"
+      }
+    },
+    "placeholder_phrases": {
+      "auto_generated_id": "保存时自动生成",
+      "select": "请选择",
+      "search": "搜索{对象名}",
+      "input_number": "0",
+      "input_currency": "¥ 0"
+    },
+    "char_counter_required_for": ["textarea 类长文本字段，如『单据备注』、『产品备注』"]
+  },
+
+  "interaction_patterns": {
+    "form_collapse": {
+      "trigger": "基本信息区底部居中的 ^ 按钮",
+      "behavior": "折叠后只显示已填关键字段或全部隐藏，节省垂直空间聚焦表格录入"
+    },
+    "column_batch_edit": {
+      "trigger": "表头列名右侧的『批量』蓝字链接",
+      "behavior": "点击弹层 → 输入新值 → 应用到所有行（或勾选的行）该列"
+    },
+    "row_add": {
+      "trigger": "表格最后一行的 + 蓝色虚线方框按钮",
+      "behavior": "在末尾插入一行空白数据，焦点自动跳到第一个必填列"
+    },
+    "row_remove_copy": {
+      "trigger": "每行操作列的蓝字链接『移除』『复制』",
+      "behavior": "移除直接删除该行；复制在下方插入相同内容的新行"
+    },
+    "help_tooltip": {
+      "trigger": "复杂列名后的 ⓘ 图标（如 FNSKU、FBA建议采购量）",
+      "behavior": "鼠标悬停显示该字段的业务说明 tooltip"
+    },
+    "horizontal_scroll": {
+      "_desc": "明细字段过多时表格横向滚动；操作列固定右侧不随滚动"
+    },
+    "save_or_submit": {
+      "_desc": "提交 = 正式保存并进入下一状态；暂存 = 保留为草稿可继续编辑；取消 = 弹确认后丢弃"
+    }
+  },
+
+  "field_table_schema": {
+    "_desc": "用户上传字段表格时，本 pattern 期望的列结构。生成原型时按此映射。",
+    "expected_columns": [
+      {"name": "字段名", "required": true, "desc": "如『采购单号』『采购仓库』"},
+      {"name": "组件类型", "required": true, "values": ["输入框", "下拉框", "日期", "数值", "金额", "百分比", "文本域", "上传", "单选", "多选"]},
+      {"name": "是否必填", "required": true, "values": ["是", "否"]},
+      {"name": "默认值", "required": false, "desc": "有则在原型中直接显示该值"},
+      {"name": "占位提示", "required": false, "desc": "无默认值且需要 placeholder 时填写"},
+      {"name": "选项/数据源", "required": false, "desc": "下拉/单选/多选的可选值，逗号分隔或备注数据来源"},
+      {"name": "字段说明", "required": false, "desc": "若填写则在字段名后显示 ⓘ tooltip"},
+      {"name": "字段分组", "required": false, "desc": "如『基本信息』『费用信息』，用于将字段放进不同卡片"},
+      {"name": "最大长度", "required": false, "desc": "文本域字段会显示字符计数器"}
+    ]
+  },
+
+  "generation_rules": {
+    "_desc": "由字段表 → 原型的映射规则",
+    "rules": [
+      "每个『字段分组』渲染为一个独立卡片块（白底、20px 24px 内边距、上下间距 16px）",
+      "字段在卡片内按 4 列网格平铺，按表格顺序填充",
+      "必填字段：标签后追加红色 *",
+      "有默认值的字段：直接在输入控件中显示该值，不显示 placeholder",
+      "无默认值的字段：显示 placeholder；下拉默认『请选择』",
+      "组件类型映射：输入框→input.borderless-underline / 下拉框→select / 金额→currency_input / 百分比→percent_input / 文本域→textarea + char_counter / 上传→upload",
+      "若字段表有『明细表格』section，渲染为 data_table 区块；否则只有基本信息区",
+      "底部固定按钮固定为：取消 + 暂存 + 提交（提交为主色）"
+    ]
+  }
+}

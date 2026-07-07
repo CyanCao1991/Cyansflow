@@ -1,0 +1,194 @@
+<!--
+========================================================================
+  原型标注层（annotation layer）
+  ------------------------------------------------------------------------
+  使用说明（给后续做二次改写的人 / AI 看）：
+  1. 本段代码整体注入在原型 HTML 的 </body> 之前，是独立的一层，
+     不依赖、也不修改原型自身的样式与交互。
+  2. 所有标注内容集中存放在下方的 ANNOTATIONS 数组里，一条 = 一个角标。
+     想增删改某条说明，只改 ANNOTATIONS 即可，无需动其它代码。
+  3. 每条标注通过 selector 绑定到原型里的某个元素：
+       - 推荐做法：在目标元素上加 data-anno="1"，这里 selector 写 '[data-anno="1"]'
+       - selector 也可以是任意合法的 CSS 选择器（如 '#supplier' / '.toolbar .btn-search'）
+  4. groups 里只写“需要补充说明”的分组，没内容的分组直接省略：
+       - 数据规范：数据来源、枚举值、初始值、小数点等
+       - 交互表现：只补充页面上看不出来的交互（行为、反馈、联动）
+       - 处理逻辑：前端校验、后端处理、异常情况
+========================================================================
+-->
+
+<!-- ========== 标注数据（集中存放，便于人或 AI 二次改写） ========== -->
+<script>
+window.__ANNOTATIONS__ = [
+  /*__ANNOTATIONS__*/
+];
+</script>
+
+<!-- ========== 标注层样式 ========== -->
+<style>
+  #anno-toggle{
+    position:fixed; top:16px; right:16px; z-index:2147483000;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 14px; border:none; border-radius:18px; cursor:pointer;
+    font:600 13px/1 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    color:#fff; background:#e23b3b; box-shadow:0 2px 8px rgba(0,0,0,.18);
+    user-select:none; transition:background .15s;
+  }
+  #anno-toggle.off{ background:#9aa0a6; }
+  #anno-toggle .dot{ width:7px; height:7px; border-radius:50%; background:#fff; opacity:.9; }
+
+  #anno-badges{ position:absolute; top:0; left:0; width:0; height:0; z-index:2147482000; }
+  .anno-badge{
+    position:absolute; width:20px; height:20px; margin:-10px 0 0 -10px;
+    border-radius:50%; background:#e23b3b; color:#fff;
+    font:700 12px/20px -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    text-align:center; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.3);
+    border:1.5px solid #fff; box-sizing:border-box;
+    transition:transform .1s;
+  }
+  .anno-badge:hover{ transform:scale(1.18); }
+
+  #anno-card{
+    position:fixed; z-index:2147483001; width:320px; max-width:calc(100vw - 24px);
+    background:#fff; border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,.22);
+    font:13px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif; color:#333;
+    overflow:hidden; display:none;
+  }
+  #anno-card .hd{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:11px 14px; background:#fafafa; border-bottom:1px solid #eee;
+  }
+  #anno-card .hd .ttl{ font-weight:700; font-size:14px; color:#222;
+    display:flex; align-items:center; gap:8px; }
+  #anno-card .hd .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; border-radius:50%; background:#e23b3b; color:#fff;
+    font-size:11px; font-weight:700;
+  }
+  #anno-card .hd .close{ cursor:pointer; color:#999; font-size:18px; line-height:1;
+    border:none; background:none; padding:0 2px; }
+  #anno-card .hd .close:hover{ color:#333; }
+  #anno-card .bd{ padding:6px 14px 12px; max-height:60vh; overflow:auto; }
+  #anno-card .grp{ margin-top:10px; }
+  #anno-card .grp .gh{
+    font-weight:700; font-size:12px; color:#e23b3b; margin-bottom:4px;
+    padding-left:8px; border-left:3px solid #e23b3b;
+  }
+  #anno-card .grp ul{ margin:0; padding-left:18px; }
+  #anno-card .grp li{ margin:2px 0; color:#444; }
+</style>
+
+<!-- ========== 标注层运行时（无需改动） ========== -->
+<script>
+(function(){
+  var DATA = window.__ANNOTATIONS__ || [];
+  var on = true;
+
+  // 总开关
+  var toggle = document.createElement('button');
+  toggle.id = 'anno-toggle';
+  toggle.innerHTML = '<span class="dot"></span><span class="txt">标注 ON</span>';
+  document.body.appendChild(toggle);
+
+  // 角标容器
+  var layer = document.createElement('div');
+  layer.id = 'anno-badges';
+  document.body.appendChild(layer);
+
+  // 注释卡片
+  var card = document.createElement('div');
+  card.id = 'anno-card';
+  document.body.appendChild(card);
+
+  var GROUP_ORDER = ['数据规范','交互表现','处理逻辑'];
+  var badges = [];
+
+  DATA.forEach(function(item, i){
+    var el = null;
+    try { el = document.querySelector(item.selector); } catch(e){}
+    var b = document.createElement('div');
+    b.className = 'anno-badge';
+    b.textContent = (i + 1);
+    b.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      openCard(item, i + 1, b);
+    });
+    layer.appendChild(b);
+    badges.push({ el: el, node: b });
+  });
+
+  function place(){
+    badges.forEach(function(x){
+      if(!x.el){ x.node.style.display = 'none'; return; }
+      var r = x.el.getBoundingClientRect();
+      if(r.width === 0 && r.height === 0){ x.node.style.display = 'none'; return; }
+      x.node.style.display = on ? 'block' : 'none';
+      // 角标贴在元素右上角（文档坐标）
+      x.node.style.left = (r.right + window.scrollX) + 'px';
+      x.node.style.top  = (r.top + window.scrollY) + 'px';
+    });
+  }
+
+  function buildCard(item, num){
+    var html = '<div class="hd"><span class="ttl"><span class="num">'+num+'</span>'
+             + (item.label || ('标注 ' + num)) + '</span>'
+             + '<button class="close" aria-label="关闭">&times;</button></div><div class="bd">';
+    var g = item.groups || {};
+    var any = false;
+    GROUP_ORDER.forEach(function(key){
+      var v = g[key];
+      if(!v) return;
+      var arr = Array.isArray(v) ? v : [v];
+      arr = arr.filter(function(s){ return s && String(s).trim(); });
+      if(!arr.length) return;
+      any = true;
+      html += '<div class="grp"><div class="gh">'+key+'</div><ul>';
+      arr.forEach(function(s){ html += '<li>'+s+'</li>'; });
+      html += '</ul></div>';
+    });
+    if(!any) html += '<div style="color:#999;padding:6px 0;">（暂无补充说明）</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function openCard(item, num, badgeNode){
+    card.innerHTML = buildCard(item, num);
+    card.querySelector('.close').addEventListener('click', function(e){
+      e.stopPropagation(); card.style.display = 'none';
+    });
+    card.style.display = 'block';
+    // 定位在角标附近，并夹在视口内
+    var br = badgeNode.getBoundingClientRect();
+    var cw = card.offsetWidth, ch = card.offsetHeight;
+    var left = br.right + 10, top = br.top;
+    if(left + cw > window.innerWidth - 8) left = br.left - cw - 10;
+    if(left < 8) left = 8;
+    if(top + ch > window.innerHeight - 8) top = window.innerHeight - ch - 8;
+    if(top < 8) top = 8;
+    card.style.left = left + 'px';
+    card.style.top = top + 'px';
+  }
+
+  toggle.addEventListener('click', function(){
+    on = !on;
+    toggle.classList.toggle('off', !on);
+    toggle.querySelector('.txt').textContent = on ? '标注 ON' : '标注 OFF';
+    if(!on) card.style.display = 'none';
+    place();
+  });
+  // 点空白处关闭卡片
+  document.addEventListener('click', function(){ card.style.display = 'none'; });
+
+  var ticking = false;
+  function onScrollResize(){
+    if(ticking) return; ticking = true;
+    requestAnimationFrame(function(){ place(); ticking = false; });
+  }
+  window.addEventListener('scroll', onScrollResize, true);
+  window.addEventListener('resize', onScrollResize);
+  if(document.readyState === 'complete') place();
+  else window.addEventListener('load', place);
+  setTimeout(place, 300); // 兜底：等原型异步渲染
+})();
+</script>
+<!-- ========== 标注层结束 ========== -->

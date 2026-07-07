@@ -1,0 +1,203 @@
+{
+  "_meta": {
+    "id": "lingxing",
+    "layer": "components",
+    "desc": "组件规则 - 该风格下各组件的样式与行为。引用 tokens.json 中的变量。"
+  },
+
+  "input": {
+    "_signature": "无边框 + 始终可见底线 - 领星风格的核心识别点。默认浅灰底线、hover 加深、focus 变蓝",
+    "style": "borderless-underline",
+    "height": "32px",
+    "background": "transparent",
+    "border": "none",
+    "border_bottom_default": "1px solid #E5E6EB",
+    "border_bottom_hover": "1px solid #C9CDD4",
+    "border_bottom_focus": "1px solid #2B5CFF",
+    "padding": "4px 8px",
+    "placeholder_color": "#C9CDD4",
+    "border_radius": "0px"
+  },
+
+  "select_enum": {
+    "_desc": "下拉框 - 选项写死（枚举值）。视觉上与 select_remote 完全一致，区别是选项硬编码",
+    "inherits": "input",
+    "suffix_icon": "▼",
+    "suffix_icon_size": "12px",
+    "suffix_icon_color": "#86909C",
+    "default_value_supported": true,
+    "placeholder": "请选择",
+    "data_source": "static"
+  },
+
+  "select_remote": {
+    "_desc": "下拉框 - 选项来自外部数据源。视觉上与 select_enum 一致",
+    "inherits": "input",
+    "suffix_icon": "▼",
+    "suffix_icon_size": "12px",
+    "suffix_icon_color": "#86909C",
+    "default_value_supported": true,
+    "placeholder": "请选择",
+    "data_source": "remote"
+  },
+
+  "select_remote_search": {
+    "_desc": "下拉框 + 输入搜索 - 选项来自外部数据源，支持关键词检索",
+    "inherits": "select_remote",
+    "searchable": true,
+    "placeholder": "请选择（查询）"
+  },
+
+  "textarea": {
+    "inherits": "input",
+    "min_height": "32px",
+    "auto_grow": true,
+    "char_counter": {
+      "position": "outside-bottom-right",
+      "format": "{current}/{max}",
+      "color": "#86909C",
+      "size": "12px"
+    }
+  },
+
+  "required_mark": {
+    "symbol": "*",
+    "color": "#FF4D4F",
+    "position": "label-suffix",
+    "spacing": "0px",
+    "_note": "红色 * 紧贴标签文字，无空格。如 '采购仓库*'"
+  },
+
+  "currency_input": {
+    "_desc": "金额输入 + 右侧币种下拉",
+    "layout": "[input]  [currency-select ▼]",
+    "default_currency": "CNY"
+  },
+
+  "percent_input": {
+    "_desc": "百分比输入 + 右侧 % 固定后缀",
+    "layout": "[input] %"
+  },
+
+  "upload": {
+    "trigger_layout": "label + icon",
+    "icon": "↑",
+    "icon_color": "#2B5CFF"
+  },
+
+  "button_primary": {
+    "background": "#2B5CFF",
+    "color": "#FFFFFF",
+    "border": "none",
+    "border_radius": "4px",
+    "padding": "6px 24px",
+    "height": "32px",
+    "font_size": "13px",
+    "hover_background": "#1E4DE8",
+    "active_background": "#1842C9"
+  },
+
+  "button_default": {
+    "background": "#FFFFFF",
+    "color": "#1D2129",
+    "border": "1px solid #E5E6EB",
+    "border_radius": "4px",
+    "padding": "6px 24px",
+    "height": "32px",
+    "font_size": "13px",
+    "hover_border": "#2B5CFF",
+    "hover_color": "#2B5CFF"
+  },
+
+  "button_toolbar": {
+    "_desc": "表格上方的批量业务操作按钮，白底蓝字",
+    "background": "#FFFFFF",
+    "color": "#2B5CFF",
+    "border": "1px solid #E5E6EB",
+    "border_radius": "4px",
+    "padding": "4px 12px",
+    "height": "28px",
+    "font_size": "13px"
+  },
+
+  "button_link": {
+    "_desc": "用于表头'批量'链接、操作列'移除/复制'等",
+    "color": "#2B5CFF",
+    "background": "transparent",
+    "border": "none",
+    "padding": "0px",
+    "font_size": "13px",
+    "hover_color": "#1E4DE8"
+  },
+
+  "add_row_button": {
+    "_desc": "表格末尾新增行的 + 按钮",
+    "shape": "square",
+    "size": "28px",
+    "border": "1px dashed #2B5CFF",
+    "background": "#FFFFFF",
+    "icon": "+",
+    "icon_color": "#2B5CFF",
+    "border_radius": "4px"
+  },
+
+  "table": {
+    "borders": "horizontal-only",
+    "header_background": "#F7F8FA",
+    "header_font_weight": 500,
+    "header_color": "#4E5969",
+    "row_height": "48px",
+    "row_hover_background": "#F7F8FA",
+    "row_selected_background": "#EFF4FF",
+    "cell_padding": "12px 16px",
+    "features": {
+      "sortable_header": "列名右侧 ⇅ 双向小箭头",
+      "help_icon": "ⓘ 紧跟列名，悬停显示 tooltip",
+      "column_batch_action": "列名后蓝字 '批量' 链接，点击批量改该列值",
+      "operation_column_fixed": "右侧固定，包含蓝字 '移除' / '复制' 等链接"
+    }
+  },
+
+  "checkbox": {
+    "size": "14px",
+    "border": "1px solid #C9CDD4",
+    "border_radius": "2px",
+    "checked_background": "#2B5CFF",
+    "checked_border": "#2B5CFF",
+    "checked_icon_color": "#FFFFFF"
+  },
+
+  "radio": {
+    "size": "14px",
+    "border": "1px solid #C9CDD4",
+    "checked_color": "#2B5CFF"
+  },
+
+  "tag": {
+    "padding": "1px 8px",
+    "border_radius": "2px",
+    "font_size": "12px",
+    "variants": {
+      "default": {"background": "#F2F3F5", "color": "#4E5969"},
+      "primary": {"background": "#E8F1FF", "color": "#2B5CFF"},
+      "success": {"background": "#E8FFEA", "color": "#52C41A"},
+      "warning": {"background": "#FFF7E6", "color": "#FAAD14"},
+      "danger": {"background": "#FFECEC", "color": "#FF4D4F"}
+    }
+  },
+
+  "tooltip": {
+    "background": "#1D2129",
+    "color": "#FFFFFF",
+    "padding": "4px 8px",
+    "font_size": "12px",
+    "border_radius": "4px"
+  },
+
+  "char_counter": {
+    "position": "input-bottom-right-outside",
+    "format": "{current}/{max}",
+    "color": "#86909C",
+    "size": "12px"
+  }
+}

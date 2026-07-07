@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增采购订单</title>
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  :root{
+    --primary:#2563eb; --primary-dark:#1d4ed8; --primary-light:#eff6ff;
+    --danger:#dc2626; --success:#16a34a; --warning:#d97706;
+    --text:#1f2937; --text-2:#6b7280; --text-3:#9ca3af;
+    --border:#e5e7eb; --border-2:#d1d5db; --bg:#f5f7fa; --bg-2:#fafbfc;
+  }
+  body{
+    font:14px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    color:var(--text); background:var(--bg); padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{ max-width:1120px; margin:0 auto; background:#fff; border-radius:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06); overflow:hidden; }
+
+  /* 顶栏 */
+  .page-hd{ display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#fff,#fcfcfd); }
+  .page-hd .left{ display:flex; align-items:center; gap:14px; }
+  .page-hd .back{ width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; color:var(--text-2);
+    cursor:pointer; font-size:16px; background:#fff; }
+  .page-hd .back:hover{ background:var(--bg); }
+  .page-hd h1{ font-size:19px; font-weight:600; letter-spacing:.3px; }
+  .page-hd .tag{ font-size:12px; padding:2px 10px; border-radius:12px;
+    background:#fef3c7; color:var(--warning); font-weight:500; }
+  .page-hd .crumb{ color:var(--text-3); font-size:13px; }
+
+  /* 区块 */
+  .section{ padding:24px 28px; }
+  .section + .section{ border-top:8px solid var(--bg); }
+  .section-title{ font-size:15px; font-weight:600; margin-bottom:20px;
+    display:flex; align-items:center; gap:9px; }
+  .section-title::before{ content:""; width:4px; height:15px; border-radius:2px;
+    background:var(--primary); display:inline-block; }
+
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px 28px; }
+  .field{ display:flex; flex-direction:column; gap:7px; }
+  .field label{ font-size:13px; color:var(--text-2); font-weight:500; }
+  .field label .req{ color:var(--danger); margin-right:3px; }
+  .field input, .field select, .field textarea{
+    height:38px; padding:0 12px; border:1px solid var(--border-2); border-radius:8px;
+    font-size:14px; color:var(--text); background:#fff; width:100%;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field select{ appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center; padding-right:30px; }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+  .field textarea{ height:auto; padding:9px 12px; resize:vertical; line-height:1.6; }
+  .field input[readonly]{ background:var(--bg-2); color:var(--text-2); cursor:default; }
+  .field .hint{ font-size:12px; color:var(--text-3); }
+
+  /* 明细表格 */
+  .tbl-wrap{ border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  thead th{ background:var(--bg-2); font-weight:600; color:var(--text-2);
+    padding:11px 12px; text-align:left; white-space:nowrap;
+    border-bottom:1px solid var(--border); }
+  tbody td{ padding:9px 12px; border-bottom:1px solid #f1f3f5; vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#fafbff; }
+  td.idx{ color:var(--text-3); text-align:center; }
+  td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  td input, td select{ width:100%; height:34px; border:1px solid var(--border-2);
+    border-radius:7px; padding:0 9px; font-size:13px; background:#fff; }
+  td select{ appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 9px center; padding-right:26px; }
+  td input:focus, td select:focus{ outline:none; border-color:var(--primary);
+    box-shadow:0 0 0 2px rgba(37,99,235,.12); }
+  td .ro{ color:var(--text-2); }
+  td .amt{ font-weight:600; color:var(--text); }
+  .chip{ display:inline-block; padding:2px 9px; border-radius:6px; font-size:12px;
+    background:#f1f5f9; color:var(--text-2); }
+  .chip.tax{ background:var(--primary-light); color:var(--primary); }
+  .btn-del{ color:var(--danger); cursor:pointer; background:none; border:none;
+    font-size:13px; padding:4px 6px; border-radius:6px; }
+  .btn-del:hover{ background:#fef2f2; }
+
+  .tbl-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+  .add-row{ color:var(--primary); cursor:pointer; border:1px dashed #93c5fd;
+    background:var(--primary-light); padding:8px 16px; border-radius:8px; font-size:13px;
+    font-weight:500; transition:.15s; }
+  .add-row:hover{ background:#dbeafe; }
+  .tbl-foot .count{ color:var(--text-3); font-size:13px; }
+
+  /* 合计 */
+  .totals{ display:flex; gap:0; justify-content:flex-end; align-items:stretch;
+    margin:20px 28px 0; background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+    border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .totals .item{ flex:0 0 auto; padding:16px 28px; text-align:right;
+    border-left:1px solid var(--border); }
+  .totals .item:first-child{ border-left:none; }
+  .totals .item .k{ font-size:12px; color:var(--text-2); }
+  .totals .item .v{ font-size:18px; font-weight:600; color:var(--text); margin-top:4px;
+    font-variant-numeric:tabular-nums; }
+  .totals .item.final{ background:#fff5f5; }
+  .totals .item.final .v{ font-size:22px; color:var(--danger); }
+
+  /* 底部操作 */
+  .page-ft{ display:flex; justify-content:flex-end; gap:12px; padding:18px 28px;
+    border-top:1px solid var(--border); background:var(--bg-2); }
+  .btn{ height:40px; padding:0 24px; border-radius:8px; font-size:14px; cursor:pointer;
+    border:1px solid var(--border-2); background:#fff; color:var(--text); font-weight:500;
+    transition:.15s; }
+  .btn:hover{ border-color:var(--text-3); }
+  .btn.ghost{ color:var(--text-2); }
+  .btn.primary{ background:var(--primary); border-color:var(--primary); color:#fff;
+    box-shadow:0 2px 6px rgba(37,99,235,.3); }
+  .btn.primary:hover{ background:var(--primary-dark); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-hd">
+    <div class="left">
+      <div class="back">‹</div>
+      <h1>新增采购订单</h1>
+      <span class="tag">草稿</span>
+    </div>
+    <span class="crumb">采购管理 / 采购订单 / 新增</span>
+  </div>
+
+  <!-- 基本信息 -->
+  <div class="section">
+    <div class="section-title">基本信息</div>
+    <div class="grid">
+      <div class="field">
+        <label><span class="req">*</span>采购单号</label>
+        <input type="text" value="PO20250610-0001" readonly>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>供应商</label>
+        <select>
+          <option value="">请选择供应商</option>
+          <option>深圳市华强电子有限公司</option>
+          <option>广州市天河贸易有限公司</option>
+          <option>东莞市长安五金厂</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>是否供应商直运</label>
+        <select>
+          <option>否</option>
+          <option>是</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>采购仓库</label>
+        <select>
+          <option value="">请选择仓库</option>
+          <option>华南中心仓</option>
+          <option>华东中心仓</option>
+          <option>华北中心仓</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>采购员</label>
+        <input type="text" value="张伟" readonly>
+      </div>
+      <div class="field">
+        <label>付款方式</label>
+        <select>
+          <option>企业转账</option>
+          <option>现金</option>
+          <option>支付宝</option>
+          <option>承兑汇票</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>预计到货日期</label>
+        <input type="date">
+      </div>
+      <div class="field">
+        <label>结算币种</label>
+        <select>
+          <option>人民币 CNY</option>
+          <option>美元 USD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>关联销售订单</label>
+        <input type="text" placeholder="可选，输入销售单号关联">
+      </div>
+    </div>
+  </div>
+
+  <!-- 商品明细 -->
+  <div class="section">
+    <div class="section-title">商品明细</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:44px;text-align:center;">#</th>
+            <th style="width:210px;">商品</th>
+            <th style="width:90px;">规格</th>
+            <th style="width:70px;">单位</th>
+            <th style="width:100px;">采购数量</th>
+            <th style="width:110px;">采购单价</th>
+            <th style="width:80px;">税率</th>
+            <th style="width:120px;text-align:right;">金额</th>
+            <th style="width:64px;text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="idx">1</td>
+            <td>
+              <select>
+                <option value="">选择商品</option>
+                <option selected>USB-C 数据线 1m</option>
+                <option>蓝牙耳机 Pro</option>
+                <option>快充充电头 65W</option>
+              </select>
+            </td>
+            <td><span class="ro">白色</span></td>
+            <td><span class="ro">条</span></td>
+            <td><input type="text" value="100"></td>
+            <td class="num"><input type="text" value="12.50"></td>
+            <td><span class="chip tax">13%</span></td>
+            <td class="num"><span class="amt">1,250.00</span></td>
+            <td style="text-align:center;"><button class="btn-del">删除</button></td>
+          </tr>
+          <tr>
+            <td class="idx">2</td>
+            <td>
+              <select>
+                <option value="">选择商品</option>
+                <option>USB-C 数据线 1m</option>
+                <option selected>蓝牙耳机 Pro</option>
+                <option>快充充电头 65W</option>
+              </select>
+            </td>
+            <td><span class="ro">黑色</span></td>
+            <td><span class="ro">个</span></td>
+            <td><input type="text" value="50"></td>
+            <td class="num"><input type="text" value="88.00"></td>
+            <td><span class="chip tax">13%</span></td>
+            <td class="num"><span class="amt">4,400.00</span></td>
+            <td style="text-align:center;"><button class="btn-del">删除</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tbl-foot">
+      <button class="add-row">+ 添加商品行</button>
+      <span class="count">共 2 个商品</span>
+    </div>
+  </div>
+
+  <!-- 合计 -->
+  <div class="totals">
+    <div class="item">
+      <div class="k">商品种类</div>
+      <div class="v">2</div>
+    </div>
+    <div class="item">
+      <div class="k">采购总数量</div>
+      <div class="v">150</div>
+    </div>
+    <div class="item">
+      <div class="k">税额</div>
+      <div class="v">650.44</div>
+    </div>
+    <div class="item final">
+      <div class="k">价税合计</div>
+      <div class="v">¥5,650.00</div>
+    </div>
+  </div>
+
+  <!-- 备注 -->
+  <div class="section">
+    <div class="field">
+      <label>备注</label>
+      <textarea rows="2" placeholder="选填，最多 200 字"></textarea>
+    </div>
+  </div>
+
+  <!-- 底部操作 -->
+  <div class="page-ft">
+    <button class="btn ghost">取消</button>
+    <button class="btn">保存草稿</button>
+    <button class="btn primary">提交审核</button>
+  </div>
+</div>
+</body>
+</html>

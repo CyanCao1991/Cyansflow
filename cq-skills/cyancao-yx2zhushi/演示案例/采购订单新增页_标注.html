@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增采购订单</title>
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  :root{
+    --primary:#2563eb; --primary-dark:#1d4ed8; --primary-light:#eff6ff;
+    --danger:#dc2626; --success:#16a34a; --warning:#d97706;
+    --text:#1f2937; --text-2:#6b7280; --text-3:#9ca3af;
+    --border:#e5e7eb; --border-2:#d1d5db; --bg:#f5f7fa; --bg-2:#fafbfc;
+  }
+  body{
+    font:14px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    color:var(--text); background:var(--bg); padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{ max-width:1120px; margin:0 auto; background:#fff; border-radius:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06); overflow:hidden; }
+
+  /* 顶栏 */
+  .page-hd{ display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#fff,#fcfcfd); }
+  .page-hd .left{ display:flex; align-items:center; gap:14px; }
+  .page-hd .back{ width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; color:var(--text-2);
+    cursor:pointer; font-size:16px; background:#fff; }
+  .page-hd .back:hover{ background:var(--bg); }
+  .page-hd h1{ font-size:19px; font-weight:600; letter-spacing:.3px; }
+  .page-hd .tag{ font-size:12px; padding:2px 10px; border-radius:12px;
+    background:#fef3c7; color:var(--warning); font-weight:500; }
+  .page-hd .crumb{ color:var(--text-3); font-size:13px; }
+
+  /* 区块 */
+  .section{ padding:24px 28px; }
+  .section + .section{ border-top:8px solid var(--bg); }
+  .section-title{ font-size:15px; font-weight:600; margin-bottom:20px;
+    display:flex; align-items:center; gap:9px; }
+  .section-title::before{ content:""; width:4px; height:15px; border-radius:2px;
+    background:var(--primary); display:inline-block; }
+
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px 28px; }
+  .field{ display:flex; flex-direction:column; gap:7px; }
+  .field label{ font-size:13px; color:var(--text-2); font-weight:500; }
+  .field label .req{ color:var(--danger); margin-right:3px; }
+  .field input, .field select, .field textarea{
+    height:38px; padding:0 12px; border:1px solid var(--border-2); border-radius:8px;
+    font-size:14px; color:var(--text); background:#fff; width:100%;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field select{ appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center; padding-right:30px; }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+  .field textarea{ height:auto; padding:9px 12px; resize:vertical; line-height:1.6; }
+  .field input[readonly]{ background:var(--bg-2); color:var(--text-2); cursor:default; }
+  .field .hint{ font-size:12px; color:var(--text-3); }
+
+  /* 明细表格 */
+  .tbl-wrap{ border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  thead th{ background:var(--bg-2); font-weight:600; color:var(--text-2);
+    padding:11px 12px; text-align:left; white-space:nowrap;
+    border-bottom:1px solid var(--border); }
+  tbody td{ padding:9px 12px; border-bottom:1px solid #f1f3f5; vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#fafbff; }
+  td.idx{ color:var(--text-3); text-align:center; }
+  td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  td input, td select{ width:100%; height:34px; border:1px solid var(--border-2);
+    border-radius:7px; padding:0 9px; font-size:13px; background:#fff; }
+  td select{ appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 9px center; padding-right:26px; }
+  td input:focus, td select:focus{ outline:none; border-color:var(--primary);
+    box-shadow:0 0 0 2px rgba(37,99,235,.12); }
+  td .ro{ color:var(--text-2); }
+  td .amt{ font-weight:600; color:var(--text); }
+  .chip{ display:inline-block; padding:2px 9px; border-radius:6px; font-size:12px;
+    background:#f1f5f9; color:var(--text-2); }
+  .chip.tax{ background:var(--primary-light); color:var(--primary); }
+  .btn-del{ color:var(--danger); cursor:pointer; background:none; border:none;
+    font-size:13px; padding:4px 6px; border-radius:6px; }
+  .btn-del:hover{ background:#fef2f2; }
+
+  .tbl-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+  .add-row{ color:var(--primary); cursor:pointer; border:1px dashed #93c5fd;
+    background:var(--primary-light); padding:8px 16px; border-radius:8px; font-size:13px;
+    font-weight:500; transition:.15s; }
+  .add-row:hover{ background:#dbeafe; }
+  .tbl-foot .count{ color:var(--text-3); font-size:13px; }
+
+  /* 合计 */
+  .totals{ display:flex; gap:0; justify-content:flex-end; align-items:stretch;
+    margin:20px 28px 0; background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+    border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .totals .item{ flex:0 0 auto; padding:16px 28px; text-align:right;
+    border-left:1px solid var(--border); }
+  .totals .item:first-child{ border-left:none; }
+  .totals .item .k{ font-size:12px; color:var(--text-2); }
+  .totals .item .v{ font-size:18px; font-weight:600; color:var(--text); margin-top:4px;
+    font-variant-numeric:tabular-nums; }
+  .totals .item.final{ background:#fff5f5; }
+  .totals .item.final .v{ font-size:22px; color:var(--danger); }
+
+  /* 底部操作 */
+  .page-ft{ display:flex; justify-content:flex-end; gap:12px; padding:18px 28px;
+    border-top:1px solid var(--border); background:var(--bg-2); }
+  .btn{ height:40px; padding:0 24px; border-radius:8px; font-size:14px; cursor:pointer;
+    border:1px solid var(--border-2); background:#fff; color:var(--text); font-weight:500;
+    transition:.15s; }
+  .btn:hover{ border-color:var(--text-3); }
+  .btn.ghost{ color:var(--text-2); }
+  .btn.primary{ background:var(--primary); border-color:var(--primary); color:#fff;
+    box-shadow:0 2px 6px rgba(37,99,235,.3); }
+  .btn.primary:hover{ background:var(--primary-dark); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-hd">
+    <div class="left">
+      <div class="back">‹</div>
+      <h1>新增采购订单</h1>
+      <span class="tag">草稿</span>
+    </div>
+    <span class="crumb">采购管理 / 采购订单 / 新增</span>
+  </div>
+
+  <!-- 基本信息 -->
+  <div class="section">
+    <div class="section-title">基本信息</div>
+    <div class="grid">
+      <div class="field">
+        <label><span class="req">*</span>采购单号</label>
+        <input type="text" value="PO20250610-0001" readonly data-anno="1">
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>供应商</label>
+        <select data-anno="2">
+          <option value="">请选择供应商</option>
+          <option>深圳市华强电子有限公司</option>
+          <option>广州市天河贸易有限公司</option>
+          <option>东莞市长安五金厂</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>是否供应商直运</label>
+        <select data-anno="3">
+          <option>否</option>
+          <option>是</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>采购仓库</label>
+        <select data-anno="4">
+          <option value="">请选择仓库</option>
+          <option>华南中心仓</option>
+          <option>华东中心仓</option>
+          <option>华北中心仓</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>采购员</label>
+        <input type="text" value="张伟" readonly data-anno="5">
+      </div>
+      <div class="field">
+        <label>付款方式</label>
+        <select>
+          <option>企业转账</option>
+          <option>现金</option>
+          <option>支付宝</option>
+          <option>承兑汇票</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span>预计到货日期</label>
+        <input type="date" data-anno="6">
+      </div>
+      <div class="field">
+        <label>结算币种</label>
+        <select>
+          <option>人民币 CNY</option>
+          <option>美元 USD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>关联销售订单</label>
+        <input type="text" placeholder="可选，输入销售单号关联" data-anno="7">
+      </div>
+    </div>
+  </div>
+
+  <!-- 商品明细 -->
+  <div class="section">
+    <div class="section-title">商品明细</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:44px;text-align:center;">#</th>
+            <th style="width:210px;">商品</th>
+            <th style="width:90px;">规格</th>
+            <th style="width:70px;">单位</th>
+            <th style="width:100px;">采购数量</th>
+            <th style="width:110px;">采购单价</th>
+            <th style="width:80px;">税率</th>
+            <th style="width:120px;text-align:right;">金额</th>
+            <th style="width:64px;text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="idx">1</td>
+            <td>
+              <select data-anno="8">
+                <option value="">选择商品</option>
+                <option selected>USB-C 数据线 1m</option>
+                <option>蓝牙耳机 Pro</option>
+                <option>快充充电头 65W</option>
+              </select>
+            </td>
+            <td><span class="ro">白色</span></td>
+            <td><span class="ro">条</span></td>
+            <td><input type="text" value="100"></td>
+            <td class="num"><input type="text" value="12.50" data-anno="9"></td>
+            <td><span class="chip tax">13%</span></td>
+            <td class="num"><span class="amt" data-anno="10">1,250.00</span></td>
+            <td style="text-align:center;"><button class="btn-del">删除</button></td>
+          </tr>
+          <tr>
+            <td class="idx">2</td>
+            <td>
+              <select>
+                <option value="">选择商品</option>
+                <option>USB-C 数据线 1m</option>
+                <option selected>蓝牙耳机 Pro</option>
+                <option>快充充电头 65W</option>
+              </select>
+            </td>
+            <td><span class="ro">黑色</span></td>
+            <td><span class="ro">个</span></td>
+            <td><input type="text" value="50"></td>
+            <td class="num"><input type="text" value="88.00"></td>
+            <td><span class="chip tax">13%</span></td>
+            <td class="num"><span class="amt">4,400.00</span></td>
+            <td style="text-align:center;"><button class="btn-del">删除</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tbl-foot">
+      <button class="add-row">+ 添加商品行</button>
+      <span class="count">共 2 个商品</span>
+    </div>
+  </div>
+
+  <!-- 合计 -->
+  <div class="totals">
+    <div class="item">
+      <div class="k">商品种类</div>
+      <div class="v">2</div>
+    </div>
+    <div class="item">
+      <div class="k">采购总数量</div>
+      <div class="v">150</div>
+    </div>
+    <div class="item">
+      <div class="k">税额</div>
+      <div class="v" data-anno="11">650.44</div>
+    </div>
+    <div class="item final">
+      <div class="k">价税合计</div>
+      <div class="v" data-anno="12">¥5,650.00</div>
+    </div>
+  </div>
+
+  <!-- 备注 -->
+  <div class="section">
+    <div class="field">
+      <label>备注</label>
+      <textarea rows="2" placeholder="选填，最多 200 字"></textarea>
+    </div>
+  </div>
+
+  <!-- 底部操作 -->
+  <div class="page-ft">
+    <button class="btn ghost">取消</button>
+    <button class="btn">保存草稿</button>
+    <button class="btn primary" data-anno="13">提交审核</button>
+  </div>
+</div>
+
+<!--
+========================================================================
+  原型标注层（annotation layer）
+  ------------------------------------------------------------------------
+  使用说明（给后续做二次改写的人 / AI 看）：
+  1. 本段代码整体注入在原型 HTML 的 </body> 之前，是独立的一层，
+     不依赖、也不修改原型自身的样式与交互。
+  2. 所有标注内容集中存放在下方的 ANNOTATIONS 数组里，一条 = 一个角标。
+     想增删改某条说明，只改 ANNOTATIONS 即可，无需动其它代码。
+  3. 每条标注通过 selector 绑定到原型里的某个元素：
+       目标元素上已加 data-anno="N"，这里 selector 写 '[data-anno="N"]'
+  4. groups 里只写“需要补充说明”的分组，没内容的分组直接省略：
+       - 数据规范：数据来源、枚举值、初始值、小数点等
+       - 交互表现：只补充页面上看不出来的交互（行为、反馈、联动）
+       - 处理逻辑：前端校验、后端处理、异常情况
+========================================================================
+-->
+
+<!-- ========== 标注数据（集中存放，便于人或 AI 二次改写） ========== -->
+<script>
+window.__ANNOTATIONS__ = [
+  {
+    selector: '[data-anno="1"]',
+    label: '采购单号',
+    groups: {
+      '数据规范': ['系统自动生成，规则：PO + 8位日期 + 4位流水（当日从 0001 起递增）', '初始为草稿态占位号，正式提交后锁定，不可修改'],
+      '处理逻辑': ['后端在保存时校验唯一性，避免并发产生重号']
+    }
+  },
+  {
+    selector: '[data-anno="2"]',
+    label: '供应商',
+    groups: {
+      '数据规范': ['数据来源：供应商档案中状态为「合作中」的供应商', '过滤掉已停用 / 已拉黑 / 审核未通过的供应商'],
+      '交互表现': ['选中后自动带出该供应商的默认付款方式与结算币种，可手动改', '支持输入关键字模糊搜索（名称 / 简称 / 助记码）'],
+      '处理逻辑': ['必填，未选时提交拦截并提示「请选择供应商」']
+    }
+  },
+  {
+    selector: '[data-anno="3"]',
+    label: '是否供应商直运',
+    groups: {
+      '数据规范': ['初始值：否'],
+      '交互表现': ['选「是」时，采购仓库置灰不可填（货物由供应商直发客户，不入仓）', '选「是」且未关联销售订单时，提示需先关联销售订单'],
+      '处理逻辑': ['直运单据后续不生成入库单，仅生成应付，与普通采购走不同流程']
+    }
+  },
+  {
+    selector: '[data-anno="4"]',
+    label: '采购仓库',
+    groups: {
+      '数据规范': ['数据来源：当前登录用户有收货权限的仓库', '过滤掉已停用的仓库'],
+      '处理逻辑': ['必填（直运单除外）；决定后续入库单的目标仓库']
+    }
+  },
+  {
+    selector: '[data-anno="5"]',
+    label: '采购员',
+    groups: {
+      '数据规范': ['默认带出当前登录人，可改为本部门其他采购员'],
+      '处理逻辑': ['作为该单据的审批与业绩归属人']
+    }
+  },
+  {
+    selector: '[data-anno="6"]',
+    label: '预计到货日期',
+    groups: {
+      '交互表现': ['日历组件，默认不选中'],
+      '处理逻辑': ['校验：不可早于今天；早于今天时提示「预计到货日期不能早于当前日期」', '到货超期未收货时，列表页该单据标红预警']
+    }
+  },
+  {
+    selector: '[data-anno="7"]',
+    label: '关联销售订单',
+    groups: {
+      '数据规范': ['数据来源：状态为「待采购 / 部分采购」的销售订单'],
+      '交互表现': ['关联后可一键把销售订单中的商品明细带入下方明细表', '直运场景下此项为必填'],
+      '处理逻辑': ['用于打通「以销定采」的库存占用与履约追踪']
+    }
+  },
+  {
+    selector: '[data-anno="8"]',
+    label: '商品（明细行）',
+    groups: {
+      '数据规范': ['数据来源：商品档案中状态为「在售 / 可采购」的商品', '过滤掉已下架 / 已停用商品'],
+      '交互表现': ['选中商品后，自动带出规格、单位、最近采购单价、默认税率（带出的单价可手改）', '同一商品重复添加时提示「该商品已存在，是否合并数量」'],
+      '处理逻辑': ['明细至少 1 行，空行在提交时被忽略']
+    }
+  },
+  {
+    selector: '[data-anno="9"]',
+    label: '采购单价',
+    groups: {
+      '数据规范': ['默认带出该商品对该供应商的最近成交价，可手改', '保留 2 位小数'],
+      '处理逻辑': ['校验：必须大于 0；修改后实时重算本行金额与底部合计', '低于历史最低价或高于最高价时给出橙色提醒（不拦截）']
+    }
+  },
+  {
+    selector: '[data-anno="10"]',
+    label: '金额（行小计）',
+    groups: {
+      '数据规范': ['只读，由系统计算，不可手填'],
+      '处理逻辑': ['计算式：采购数量 × 采购单价，结果四舍五入保留 2 位小数', '数量或单价变化时实时重算']
+    }
+  },
+  {
+    selector: '[data-anno="11"]',
+    label: '税额',
+    groups: {
+      '数据规范': ['只读，由系统汇总'],
+      '处理逻辑': ['计算式：各行（金额 ÷ (1 + 税率) × 税率）求和，逐行算后再汇总', '保留 2 位小数，四舍五入']
+    }
+  },
+  {
+    selector: '[data-anno="12"]',
+    label: '价税合计',
+    groups: {
+      '数据规范': ['只读，红色突出显示，为本单应付总额'],
+      '处理逻辑': ['计算式：所有明细行金额求和（含税）', '保留 2 位小数；金额大写在打印单据时另行生成']
+    }
+  },
+  {
+    selector: '[data-anno="13"]',
+    label: '提交审核',
+    groups: {
+      '交互表现': ['点击后先做整单校验，校验通过弹二次确认', '提交成功后单据状态由「草稿」变为「待审核」并跳转至详情页'],
+      '处理逻辑': ['后端按金额匹配审批流（如 ≥1万 需主管审批）', '提交同时按明细占用对应商品的在途/计划库存', '校验不通过时定位到第一个错误字段并高亮']
+    }
+  }
+];
+</script>
+
+<!-- ========== 标注层样式 ========== -->
+<style>
+  #anno-toggle{
+    position:fixed; top:16px; right:16px; z-index:2147483000;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 14px; border:none; border-radius:18px; cursor:pointer;
+    font:600 13px/1 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    color:#fff; background:#e23b3b; box-shadow:0 2px 8px rgba(0,0,0,.18);
+    user-select:none; transition:background .15s;
+  }
+  #anno-toggle.off{ background:#9aa0a6; }
+  #anno-toggle .dot{ width:7px; height:7px; border-radius:50%; background:#fff; opacity:.9; }
+
+  #anno-badges{ position:absolute; top:0; left:0; width:0; height:0; z-index:2147482000; }
+  .anno-badge{
+    position:absolute; width:20px; height:20px; margin:-10px 0 0 -10px;
+    border-radius:50%; background:#e23b3b; color:#fff;
+    font:700 12px/20px -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    text-align:center; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.3);
+    border:1.5px solid #fff; box-sizing:border-box;
+    transition:transform .1s;
+  }
+  .anno-badge:hover{ transform:scale(1.18); }
+
+  #anno-card{
+    position:fixed; z-index:2147483001; width:320px; max-width:calc(100vw - 24px);
+    background:#fff; border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,.22);
+    font:13px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif; color:#333;
+    overflow:hidden; display:none;
+  }
+  #anno-card .hd{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:11px 14px; background:#fafafa; border-bottom:1px solid #eee;
+  }
+  #anno-card .hd .ttl{ font-weight:700; font-size:14px; color:#222;
+    display:flex; align-items:center; gap:8px; }
+  #anno-card .hd .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; border-radius:50%; background:#e23b3b; color:#fff;
+    font-size:11px; font-weight:700;
+  }
+  #anno-card .hd .close{ cursor:pointer; color:#999; font-size:18px; line-height:1;
+    border:none; background:none; padding:0 2px; }
+  #anno-card .hd .close:hover{ color:#333; }
+  #anno-card .bd{ padding:6px 14px 12px; max-height:60vh; overflow:auto; }
+  #anno-card .grp{ margin-top:10px; }
+  #anno-card .grp .gh{
+    font-weight:700; font-size:12px; color:#e23b3b; margin-bottom:4px;
+    padding-left:8px; border-left:3px solid #e23b3b;
+  }
+  #anno-card .grp ul{ margin:0; padding-left:18px; }
+  #anno-card .grp li{ margin:2px 0; color:#444; }
+</style>
+
+<!-- ========== 标注层运行时（无需改动） ========== -->
+<script>
+(function(){
+  var DATA = window.__ANNOTATIONS__ || [];
+  var on = true;
+
+  // 总开关
+  var toggle = document.createElement('button');
+  toggle.id = 'anno-toggle';
+  toggle.innerHTML = '<span class="dot"></span><span class="txt">标注 ON</span>';
+  document.body.appendChild(toggle);
+
+  // 角标容器
+  var layer = document.createElement('div');
+  layer.id = 'anno-badges';
+  document.body.appendChild(layer);
+
+  // 注释卡片
+  var card = document.createElement('div');
+  card.id = 'anno-card';
+  document.body.appendChild(card);
+
+  var GROUP_ORDER = ['数据规范','交互表现','处理逻辑'];
+  var badges = [];
+
+  DATA.forEach(function(item, i){
+    var el = null;
+    try { el = document.querySelector(item.selector); } catch(e){}
+    var b = document.createElement('div');
+    b.className = 'anno-badge';
+    b.textContent = (i + 1);
+    b.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      openCard(item, i + 1, b);
+    });
+    layer.appendChild(b);
+    badges.push({ el: el, node: b });
+  });
+
+  function place(){
+    badges.forEach(function(x){
+      if(!x.el){ x.node.style.display = 'none'; return; }
+      var r = x.el.getBoundingClientRect();
+      if(r.width === 0 && r.height === 0){ x.node.style.display = 'none'; return; }
+      x.node.style.display = on ? 'block' : 'none';
+      // 角标贴在元素右上角（文档坐标）
+      x.node.style.left = (r.right + window.scrollX) + 'px';
+      x.node.style.top  = (r.top + window.scrollY) + 'px';
+    });
+  }
+
+  function buildCard(item, num){
+    var html = '<div class="hd"><span class="ttl"><span class="num">'+num+'</span>'
+             + (item.label || ('标注 ' + num)) + '</span>'
+             + '<button class="close" aria-label="关闭">&times;</button></div><div class="bd">';
+    var g = item.groups || {};
+    var any = false;
+    GROUP_ORDER.forEach(function(key){
+      var v = g[key];
+      if(!v) return;
+      var arr = Array.isArray(v) ? v : [v];
+      arr = arr.filter(function(s){ return s && String(s).trim(); });
+      if(!arr.length) return;
+      any = true;
+      html += '<div class="grp"><div class="gh">'+key+'</div><ul>';
+      arr.forEach(function(s){ html += '<li>'+s+'</li>'; });
+      html += '</ul></div>';
+    });
+    if(!any) html += '<div style="color:#999;padding:6px 0;">（暂无补充说明）</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function openCard(item, num, badgeNode){
+    card.innerHTML = buildCard(item, num);
+    card.querySelector('.close').addEventListener('click', function(e){
+      e.stopPropagation(); card.style.display = 'none';
+    });
+    card.style.display = 'block';
+    // 定位在角标附近，并夹在视口内
+    var br = badgeNode.getBoundingClientRect();
+    var cw = card.offsetWidth, ch = card.offsetHeight;
+    var left = br.right + 10, top = br.top;
+    if(left + cw > window.innerWidth - 8) left = br.left - cw - 10;
+    if(left < 8) left = 8;
+    if(top + ch > window.innerHeight - 8) top = window.innerHeight - ch - 8;
+    if(top < 8) top = 8;
+    card.style.left = left + 'px';
+    card.style.top = top + 'px';
+  }
+
+  toggle.addEventListener('click', function(){
+    on = !on;
+    toggle.classList.toggle('off', !on);
+    toggle.querySelector('.txt').textContent = on ? '标注 ON' : '标注 OFF';
+    if(!on) card.style.display = 'none';
+    place();
+  });
+  // 点空白处关闭卡片
+  document.addEventListener('click', function(){ card.style.display = 'none'; });
+
+  var ticking = false;
+  function onScrollResize(){
+    if(ticking) return; ticking = true;
+    requestAnimationFrame(function(){ place(); ticking = false; });
+  }
+  window.addEventListener('scroll', onScrollResize, true);
+  window.addEventListener('resize', onScrollResize);
+  if(document.readyState === 'complete') place();
+  else window.addEventListener('load', place);
+  setTimeout(place, 300); // 兜底：等原型异步渲染
+})();
+</script>
+<!-- ========== 标注层结束 ========== -->
+</body>
+</html>
