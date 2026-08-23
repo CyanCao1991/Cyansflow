@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-cream-100 text-cacao-700 font-sans antialiased;
+    background-image: theme('backgroundImage.paper');
+    background-attachment: fixed;
+    background-size: cover;
+    /* 颗粒纹理叠层 */
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: theme('backgroundImage.noise');
+    background-size: 160px 160px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: multiply;
+  }
+  h1, h2, h3, h4, h5 {
+    @apply font-display;
+    letter-spacing: -0.01em;
+  }
+  /* 数字 tabular，对齐表格数字 */
+  .num {
+    font-family: theme('fontFamily.mono');
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* 卡片基础样式 */
+  .card-base {
+    @apply bg-cream-50/85 backdrop-blur-sm border border-cream-300/70 rounded-2xl2 shadow-card;
+  }
+  /* 输入框统一样式 */
+  .field-input {
+    @apply w-full bg-cream-50 border border-cream-300 rounded-xl px-3.5 py-2.5 text-cacao-700
+           placeholder:text-cacao-400/60 focus:outline-none focus:ring-2 focus:ring-olive-300
+           focus:border-olive-300 transition;
+  }
+  .field-label {
+    @apply block text-xs font-semibold uppercase tracking-wider text-cacao-400 mb-1.5;
+  }
+  /* 主按钮 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-olive-600
+           text-cream-50 font-semibold shadow-soft hover:bg-olive-700 active:scale-[0.98]
+           transition disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-cream-50
+           border border-cream-300 text-cacao-600 font-semibold hover:bg-cream-200
+           active:scale-[0.98] transition;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-cacao-500
+           hover:bg-cream-200/70 hover:text-cacao-700 transition;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-tomato-600
+           hover:bg-tomato-500/10 transition;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+}
+
+/* 自定义滚动条 - 温暖主题 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(107, 133, 64, 0.25);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 133, 64, 0.45);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* 选中文本 */
+::selection {
+  background: rgba(232, 131, 58, 0.25);
+  color: #2B2018;
+}
