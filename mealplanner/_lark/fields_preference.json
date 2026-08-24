@@ -1,0 +1,51 @@
+[
+  { "type": "text", "name": "配置名", "description": "同一份 Base 可以保存多套偏好（例如默认、减脂期）" },
+  { "type": "select", "name": "喜欢口味", "multiple": true,
+    "options": [
+      { "name": "清淡", "hue": "Green", "lightness": "Lighter" },
+      { "name": "重口", "hue": "Red", "lightness": "Light" },
+      { "name": "麻辣", "hue": "Red", "lightness": "Light" },
+      { "name": "酸甜", "hue": "Yellow", "lightness": "Light" },
+      { "name": "咸鲜", "hue": "Blue", "lightness": "Lighter" },
+      { "name": "快手", "hue": "Orange", "lightness": "Lighter" }
+    ]
+  },
+  { "type": "select", "name": "忌口口味", "multiple": true,
+    "options": [
+      { "name": "麻辣", "hue": "Red", "lightness": "Light" },
+      { "name": "重口", "hue": "Red", "lightness": "Lighter" },
+      { "name": "过咸", "hue": "Gray", "lightness": "Light" },
+      { "name": "过甜", "hue": "Yellow", "lightness": "Light" }
+    ]
+  },
+  { "type": "text", "name": "忌口食材(JSON)", "description": "字符串数组 JSON" },
+  { "type": "select", "name": "偏好菜系", "multiple": true,
+    "options": [
+      { "name": "家常", "hue": "Green", "lightness": "Lighter" },
+      { "name": "川菜", "hue": "Red", "lightness": "Lighter" },
+      { "name": "粤菜", "hue": "Blue", "lightness": "Lighter" },
+      { "name": "西式", "hue": "Purple", "lightness": "Lighter" },
+      { "name": "日式", "hue": "Wathet", "lightness": "Lighter" },
+      { "name": "韩式", "hue": "Orange", "lightness": "Light" }
+    ]
+  },
+  { "type": "select", "name": "餐数", "multiple": false,
+    "options": [
+      { "name": "1 餐", "hue": "Gray", "lightness": "Light" },
+      { "name": "2 餐", "hue": "Blue", "lightness": "Lighter" },
+      { "name": "3 餐", "hue": "Green", "lightness": "Lighter" },
+      { "name": "4 餐(加小食)", "hue": "Orange", "lightness": "Light" }
+    ]
+  },
+  { "type": "number", "name": "热量目标(kcal)", "style": { "type": "plain", "precision": 0 } },
+  { "type": "select", "name": "营养重点", "multiple": true,
+    "options": [
+      { "name": "高蛋白", "hue": "Yellow", "lightness": "Light" },
+      { "name": "低脂", "hue": "Blue", "lightness": "Lighter" },
+      { "name": "低卡", "hue": "Turquoise", "lightness": "Lighter" },
+      { "name": "素食", "hue": "Lime", "lightness": "Lighter" },
+      { "name": "均衡", "hue": "Green", "lightness": "Lighter" }
+    ]
+  },
+  { "type": "checkbox", "name": "优先消耗临期" }
+]

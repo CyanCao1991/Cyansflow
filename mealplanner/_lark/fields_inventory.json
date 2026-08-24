@@ -1,0 +1,24 @@
+[
+  { "type": "text", "name": "名称", "description": "食材/调味料名称（主键）" },
+  { "type": "select", "name": "类型", "multiple": false, "description": "ingredient 食材 / seasoning 调味料",
+    "options": [
+      { "name": "食材", "hue": "Green", "lightness": "Lighter" },
+      { "name": "调味料", "hue": "Blue", "lightness": "Lighter" }
+    ]
+  },
+  { "type": "text", "name": "子分类", "description": "如 蔬菜、肉类、佐料" },
+  { "type": "number", "name": "数量", "style": { "type": "plain", "precision": 2, "thousands_separator": false } },
+  { "type": "text", "name": "单位", "description": "如 g / 个 / ml / 瓶" },
+  { "type": "datetime", "name": "采购日期", "style": { "format": "yyyy-MM-dd" } },
+  { "type": "datetime", "name": "保质期至", "style": { "format": "yyyy-MM-dd" } },
+  { "type": "select", "name": "标签", "multiple": true, "description": "口味属性标签",
+    "options": [
+      { "name": "清淡", "hue": "Green", "lightness": "Lighter" },
+      { "name": "高蛋白", "hue": "Yellow", "lightness": "Light" },
+      { "name": "主食替代", "hue": "Orange", "lightness": "Lighter" },
+      { "name": "素食", "hue": "Lime", "lightness": "Lighter" },
+      { "name": "辣", "hue": "Red", "lightness": "Lighter" }
+    ]
+  },
+  { "type": "text", "name": "备注" }
+]

@@ -1,0 +1,10 @@
+[
+  { "type": "datetime", "name": "日期", "style": { "format": "yyyy-MM-dd" } },
+  { "type": "datetime", "name": "生成时间", "style": { "format": "yyyy-MM-dd HH:mm" } },
+  { "type": "number", "name": "餐数", "style": { "type": "plain", "precision": 0 } },
+  { "type": "number", "name": "总热量(kcal)", "style": { "type": "plain", "precision": 0 } },
+  { "type": "number", "name": "缺料项数", "style": { "type": "plain", "precision": 0 } },
+  { "type": "number", "name": "覆盖率(%)", "style": { "type": "progress", "percentage": true, "color": "Green" } },
+  { "type": "checkbox", "name": "使用了临期食材" },
+  { "type": "text", "name": "详情(JSON)", "description": "完整三餐详情 JSON：[{type,recipeId,recipeSnapshot,matched,missing}]" }
+]

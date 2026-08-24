@@ -85,12 +85,15 @@ export function AppProvider({ children }) {
 
   const value = useMemo(() => ({
     inventory, recipes, preference, plans,
+    setInventory, setRecipes, setPreference, setPlans,
     toasts, toast, dismissToast,
     addIngredient, updateIngredient, removeIngredient,
     addRecipe, updateRecipe, removeRecipe,
     updatePreference, savePlan, removePlan, resetAll,
   }), [
-    inventory, recipes, preference, plans, toasts,
+    inventory, recipes, preference, plans,
+    setInventory, setRecipes, setPreference, setPlans,
+    toasts,
     toast, dismissToast, addIngredient, updateIngredient, removeIngredient,
     addRecipe, updateRecipe, removeRecipe, updatePreference, savePlan, removePlan, resetAll,
   ])

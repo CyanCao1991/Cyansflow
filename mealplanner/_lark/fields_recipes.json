@@ -1,0 +1,39 @@
+[
+  { "type": "text", "name": "菜名" },
+  { "type": "select", "name": "餐型", "multiple": false,
+    "options": [
+      { "name": "早餐", "hue": "Orange", "lightness": "Lighter" },
+      { "name": "午餐", "hue": "Green", "lightness": "Lighter" },
+      { "name": "晚餐", "hue": "Blue", "lightness": "Lighter" },
+      { "name": "小食", "hue": "Gray", "lightness": "Light" }
+    ]
+  },
+  { "type": "text", "name": "菜系" },
+  { "type": "select", "name": "难度", "multiple": false,
+    "options": [
+      { "name": "简单", "hue": "Green", "lightness": "Lighter" },
+      { "name": "中等", "hue": "Orange", "lightness": "Lighter" },
+      { "name": "较难", "hue": "Red", "lightness": "Lighter" }
+    ]
+  },
+  { "type": "number", "name": "时长(分)", "style": { "type": "plain", "precision": 0 } },
+  { "type": "number", "name": "热量(kcal)", "style": { "type": "plain", "precision": 0 } },
+  { "type": "number", "name": "份数", "style": { "type": "plain", "precision": 0 } },
+  { "type": "select", "name": "标签", "multiple": true,
+    "options": [
+      { "name": "清淡", "hue": "Green", "lightness": "Lighter" },
+      { "name": "重口", "hue": "Red", "lightness": "Light" },
+      { "name": "快手", "hue": "Orange", "lightness": "Lighter" },
+      { "name": "高蛋白", "hue": "Yellow", "lightness": "Light" },
+      { "name": "低脂", "hue": "Blue", "lightness": "Lighter" },
+      { "name": "低卡", "hue": "Turquoise", "lightness": "Lighter" },
+      { "name": "素食", "hue": "Lime", "lightness": "Lighter" },
+      { "name": "下饭", "hue": "Carmine", "lightness": "Lighter" },
+      { "name": "汤品", "hue": "Wathet", "lightness": "Lighter" },
+      { "name": "健身", "hue": "Green", "lightness": "Light" }
+    ]
+  },
+  { "type": "text", "name": "原料(JSON)", "description": "JSON 数组存储 [{name,qty,unit,isMain}]" },
+  { "type": "text", "name": "步骤(JSON)", "description": "JSON 数组字符串数组" },
+  { "type": "text", "name": "备注" }
+]
